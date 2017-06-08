@@ -13,13 +13,14 @@ class IntentHandler {
     // requestor name
     // actual message?
     if (intent === "addUserCommand") {
-      let usersIdToAdd = entities.users;
+      let usersIdToAdd = Array.from(new Set(entities.users));
       
       // fetch users based on entities from message
       return this.getKnownAndUnknownUsers(usersIdToAdd)
       .then(({knownUsers, unknownUsers}) => {
         // add ids to our list
         this.list[context.channel] = this.list[context.channel] || [];
+        // FIXME should use Set instead of array
         knownUsers.forEach((id) => this.list[context.channel].push(id));
         unknownUsers.forEach((id) => this.list[context.channel].push(id));
 

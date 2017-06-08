@@ -27,7 +27,6 @@ describe('intent handlers', function() {
     
     expect(client.getUsers.called).to.be.false;
     expect(client.messageChannel.called).to.be.false;
-      
     
     return ih.handleIntent(
       "addUserCommand",
@@ -51,6 +50,41 @@ describe('intent handlers', function() {
       expect(client.messageChannel.called).to.be.true;
       expect(ih.list[channel])
         .to.be.deep.equal(addUsersList1.concat(addUsersList2));
+    });
+  });
+  
+  it('must ignore duplicates', function() {
+    var client = {
+      getUsers: 
+        sinon.stub().returns(Promise.resolve({
+          ok: true,
+          members: [
+            { name: "joe" },
+            { name: "bob" },
+            { name: "alice" },
+          ]
+        })),
+      messageChannel: sinon.spy()  
+    };
+    
+    var addUsersList = ["joe", "joe"];
+    var uniqueList = Array.from(new Set(addUsersList));
+    var channel = "someChannel";
+    var ih = new IntentHandler(client);
+    
+    
+    expect(client.getUsers.called).to.be.false;
+    expect(client.messageChannel.called).to.be.false;
+    
+    return ih.handleIntent(
+      "addUserCommand",
+      { users: addUsersList },
+      { channel: channel }
+    ).then(function () {
+      expect(client.getUsers.calledOnce).to.be.true;
+      expect(client.messageChannel.called).to.be.true;
+      expect(ih.list[channel]).to.be.deep.equal(uniqueList);
+      expect(ih.list[channel]).to.be.not.deep.equal(addUsersList);
     });
   });
 });
