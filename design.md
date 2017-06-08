@@ -15,7 +15,7 @@ What might happen after:
 
 ## Operations
 Invite to channel: 
-* say hello
+* say hello and how to use
 
 Add user(s):
 - one valid user /u/
@@ -25,8 +25,22 @@ Add user(s):
   * look up /u/
   * say "I can't find /u/. Do you want to add them anyways?"
 - many users, some of which are invalid
-  * look up user
-  * say "I can't find $user1, $user2, $user3. Do you want to add them anyways?
+  * look up users
+  * say "I can't find $user1, $user2, $user3, but I added them anyways.
+- add duplicate users
+  * add as normal but only use unique names
+- add some users that have already been added.
+  * look up users
+  * say "$user1 and $user2 is my list, so I can already pair them."
+- add some users that haven't been added and some that have
+  * look up users
+  * say "I've added $user1 and $user2".
+  * say "$user3 is my list, so I can already pair them."
+- add some users that have been added, some that haven't and some that don't exist
+  * look up users
+  * say "I've added $user1 and ..."
+  * say "$user2 is in my list, so I can already pair them."
+  * say "I don't know who $user3 is, but I added them anyways. You should add people by their slack name, if they have one in the future."
 
 List user(s)
 
