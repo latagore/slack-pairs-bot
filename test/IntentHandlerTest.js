@@ -1,3 +1,5 @@
+/* jshint expr:true */
+/* allow expr because of chai.expect */
 var IntentHandler = require('../core/IntentHandler.js');
 var expect = require('chai').expect;
 var sinon = require('sinon');
@@ -14,21 +16,41 @@ describe('intent handlers', function() {
             { name: "alice" },
           ]
         })),
-      message: sinon.spy()  
+      messageChannel: sinon.spy()  
     };
     
-    var addUsersList = ["joe", "bob"];
+    var addUsersList1 = ["joe", "bob"];
+    var addUsersList2 = ["alice"];
     var channel = "someChannel";
     var ih = new IntentHandler(client);
-    ih.handleIntent(
+    
+    
+    expect(client.getUsers.called).to.be.false;
+    expect(client.messageChannel.called).to.be.false;
+      
+    
+    return ih.handleIntent(
       "addUserCommand",
-      { users: addUsersList },
+      { users: addUsersList1 },
       { channel: channel }
-    );
-    
-    expect(client.getUsers.calledOnce).to.be.true; // stub may not have "calledOnce"
-    //expect(client.message.calledOnce).to.be.true;
-    expect(IntentHandler.list[channel]).to.be.equal(addUsersList);
-    
+    ).then(function () {
+      expect(client.getUsers.calledOnce).to.be.true;
+      expect(client.messageChannel.called).to.be.true;
+      expect(ih.list[channel]).to.be.deep.equal(addUsersList1);
+      
+      client.getUsers.resetHistory();
+      client.messageChannel.reset();
+    }).then(function () {
+      return ih.handleIntent(
+        "addUserCommand",
+        { users: addUsersList2 },
+        { channel: channel }
+      );
+    }).then(function () {
+      expect(client.getUsers.calledOnce).to.be.true;
+      expect(client.messageChannel.called).to.be.true;
+      expect(ih.list[channel])
+        .to.be.deep.equal(addUsersList1.concat(addUsersList2));
+    });
   });
 });

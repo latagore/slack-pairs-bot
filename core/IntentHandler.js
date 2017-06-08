@@ -3,7 +3,7 @@
 class IntentHandler {
   constructor(client) {
     this.client = client;
-    this.list = [];
+    this.list = {};
   }
   
   handleIntent(intent, entities, context) {
@@ -16,13 +16,13 @@ class IntentHandler {
       let usersIdToAdd = entities.users;
       
       // fetch users based on entities from message
-      this.getKnownAndUnknownUsers()
+      return this.getKnownAndUnknownUsers(usersIdToAdd)
       .then(({knownUsers, unknownUsers}) => {
         // add ids to our list
         this.list[context.channel] = this.list[context.channel] || [];
         knownUsers.forEach((id) => this.list[context.channel].push(id));
         unknownUsers.forEach((id) => this.list[context.channel].push(id));
-        
+
         // answer the requestor
         if (unknownUsers.length) {
           this.client.messageChannel(`I added ${knownUsers.length + unknownUsers.length}. I don't know who ${unknownUsers.join(', ')} are, but I added them anyways.`, context.userId);
