@@ -30,6 +30,39 @@ Add user(s):
 
 List user(s)
 
+## Internal design
+
+### model.js
+
+function recieveMessage(message)
+  {intent, entities} = getIntent(message);
+  list actions = handleIntent(intent, entities)
+  return actions;
+end
+
+private function getIntent(message)
+  returns the intent of the message and the entities contained in it
+
+private function handleIntent(intent)
+  intentHandler[intent](entities)
+end
+
+#### example intentHandler for handleIntent():
+fn addUsers({users}) 
+  message("I added users")
+  
+fn addUsersHandler({users})
+  addUsers(validUsers);
+  actions.add(
+   message("I added `validUsers`");
+  )
+  if (invalidUsers) then
+   actions.add(
+     message("I don't know who `invalidUsers` are");
+   )
+  endif
+end
+
 ## Grammar
 /addUserCommand/
   /bot/ add [/user_entity/] /list/
