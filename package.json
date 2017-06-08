@@ -1,0 +1,33 @@
+{
+  "name": "pairsbot",
+  "version": "0.1.0",
+  "description": "",
+  "main": "bot.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "chai": "^4.0.2"
+  },
+  "devDependencies": {
+    "mocha": "^3.4.2",
+    "sinon": "^2.3.2"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/latagore/slack-pairs-bot.git"
+  },
+  "keywords": [
+    "chatbot",
+    "student_project"
+  ],
+  "author": "Steven Xu",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/latagore/slack-pairs-bot/issues"
+  },
+  "homepage": "https://github.com/latagore/slack-pairs-bot#readme"
+}
