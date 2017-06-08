@@ -33,35 +33,27 @@ List user(s)
 ## Internal design
 
 ### model.js
-
-function recieveMessage(message)
+function recieveMessage(message, context)
   {intent, entities} = getIntent(message);
-  list actions = handleIntent(intent, entities)
-  return actions;
+  handleIntent(intent, entities, context);
 end
 
 private function getIntent(message)
   returns the intent of the message and the entities contained in it
 
-private function handleIntent(intent)
-  intentHandler[intent](entities)
+private function handleIntent(intent, entities, context)
+  intentHandler.handle(intent, entities, context)
 end
 
-#### example intentHandler for handleIntent():
-fn addUsers({users}) 
-  message("I added users")
-  
-fn addUsersHandler({users})
-  addUsers(validUsers);
-  actions.add(
-   message("I added `validUsers`");
-  )
-  if (invalidUsers) then
-   actions.add(
-     message("I don't know who `invalidUsers` are");
-   )
-  endif
+#### IntentHandler
+function handle(intent, entities, context) 
+  if intent is addUserCommand
+    execute command to match intent using abstracted "this.client"
+  else if ...
+    ...
+  end if
 end
+
 
 ## Grammar
 /addUserCommand/
