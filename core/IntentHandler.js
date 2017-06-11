@@ -15,6 +15,10 @@ class IntentHandler {
     if (intent === "addUserCommand") {
       let usersIdToAdd = Array.from(new Set(entities.users));
       
+      if (!entities.users.length) {
+        this.client.messageChannel('I didn\'t see any names to add. You can try something similar to "add users @joe @bob".');
+      }
+      
       // fetch users based on entities from message
       this.list[context.channel] = this.list[context.channel] || new Set();
       return this.classifyUsers(usersIdToAdd, this.list[context.channel])
