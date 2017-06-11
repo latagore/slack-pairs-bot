@@ -36,13 +36,36 @@ class IntentHandler {
         } else {
           this.client.messageChannel(`I added ${knownUsers.length} users!`, context.userId);
         }
-
       })
       .catch((err) => {
         console.error(err);
         this.client.messageChannel(`Something went wrong. Let our software monkeys know that this bot has malfunctioned.`);
       });
-    }
+    } else if (intent === "removeUserCommand") {
+      if (!entities.users.length) {
+        this.client.messageChannel('I didn\'t see any names to remove. You can try something similar to "remove users @joe @bob".');
+      }
+      
+      let usersIdToRemove = Array.from(new Set(entities.users));
+      
+      const removedUsers = [];
+      const unknownUsers = [];
+      usersIdToRemove.forEach(userId => {
+        if (this.list[context.channel].has(userId)) {
+          removedUsers.push(userId);
+          this.list[context.channel].delete(userId);
+        } else {
+          unknownUsers.push(userId);
+        }
+      });
+      
+      if (removedUsers.length) {
+        this.client.messageChannel(`I removed ${removedUsers.join(', ')} from my list.`);
+      }
+      if (unknownUsers.length) {
+        this.client.messageChannel(`Hm... My list doesn't have ${unknownUsers.join(', ')}. You can see who's in my list with "list users".`);
+      }
+    } 
   }
 
   classifyUsers(usersIdToAdd, list) {
