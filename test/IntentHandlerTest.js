@@ -196,5 +196,7 @@ describe('intent handlers', function() {
     });
   });
   
+  it('must accept removing users from an empty channel gracefully');
+  
   it('must separate @real_users and names');
 });
