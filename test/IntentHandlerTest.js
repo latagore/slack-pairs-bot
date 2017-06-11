@@ -100,4 +100,10 @@ describe('intent handlers', function() {
       expect(Array.from(ih.list[channel])).to.be.deep.equal(uniqueList);
     });
   });
+  
+  it('must accept no users to add');
+  
+  it('must remove users');
+  
+  it('must separate @real_users and names');
 });
