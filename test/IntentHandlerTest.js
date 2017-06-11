@@ -101,7 +101,65 @@ describe('intent handlers', function() {
     });
   });
   
-  it('must accept no users to add');
+  it('must accept no users to add', function() {
+    var client = {
+      getUsers: 
+        sinon.stub().returns(Promise.resolve({
+          ok: true,
+          members: [
+            { name: "joe" },
+            { name: "bob" },
+            { name: "alice" },
+          ]
+        })),
+      messageChannel: sinon.spy()  
+    };
+    
+    var addUsersList = ["joe"];
+    var emptyUsersList = [];
+    var channel = "someChannel";
+    var ih = new IntentHandler(client);
+    
+    
+    expect(client.getUsers.called).to.be.false;
+    expect(client.messageChannel.called).to.be.false;
+    
+    return ih.handleIntent(
+        "addUserCommand",
+        { users: emptyUsersList },
+        { channel: channel }
+    ).then(function () {
+      expect(client.getUsers.calledOnce).to.be.true;
+      expect(client.messageChannel.called).to.be.true;
+      expect(Array.from(ih.list[channel])).to.be.deep.equal(emptyUsersList);
+      
+      client.getUsers.resetHistory();
+      client.messageChannel.reset();
+    }).then(function () {
+      return ih.handleIntent(
+        "addUserCommand",
+        { users: addUsersList },
+        { channel: channel }
+      );
+    }).then(function () {
+      expect(client.getUsers.calledOnce).to.be.true;
+      expect(client.messageChannel.called).to.be.true;
+      expect(Array.from(ih.list[channel])).to.be.deep.equal(addUsersList);
+      
+      client.getUsers.resetHistory();
+      client.messageChannel.reset();
+    }).then(function () {
+      return ih.handleIntent(
+        "addUserCommand",
+        { users: emptyUsersList },
+        { channel: channel }
+      );
+    }).then(function () {
+      expect(client.getUsers.calledOnce).to.be.true;
+      expect(client.messageChannel.called).to.be.true;
+      expect(Array.from(ih.list[channel])).to.be.deep.equal(addUsersList);
+    });
+  });
   
   it('must remove users');
   
