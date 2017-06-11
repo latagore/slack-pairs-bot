@@ -65,7 +65,9 @@ class IntentHandler {
       if (unknownUsers.length) {
         this.client.messageChannel(`Hm... My list doesn't have ${unknownUsers.join(', ')}. You can see who's in my list with "list users".`);
       }
-    } 
+    }
+    
+    return Promise.resolve();
   }
 
   classifyUsers(usersIdToAdd, list) {

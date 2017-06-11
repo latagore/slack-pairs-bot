@@ -161,7 +161,40 @@ describe('intent handlers', function() {
     });
   });
   
-  it('must remove users');
+  it('must remove users', function() {
+    var client = {
+      messageChannel: sinon.spy()  
+    };
+    
+    var addUsersList1 = ["joe", "bob"];
+    var addUsersList2 = ["alice"];
+    var channel = "someChannel";
+    var ih = new IntentHandler(client);
+    ih.list[channel] = new Set(["joe", "bob", "alice"]);
+    
+    
+    expect(client.messageChannel.called).to.be.false;
+    
+    return ih.handleIntent(
+      "removeUserCommand",
+      { users: addUsersList1 },
+      { channel: channel }
+    ).then(function () {
+      expect(client.messageChannel.called).to.be.true;
+      expect(Array.from(ih.list[channel])).to.be.deep.equal(["alice"]);
+      
+      client.messageChannel.reset();
+    }).then(function () {
+      return ih.handleIntent(
+        "removeUserCommand",
+        { users: addUsersList2 },
+        { channel: channel }
+      );
+    }).then(function () {
+      expect(client.messageChannel.called).to.be.true;
+      expect(Array.from(ih.list[channel])).to.be.deep.equal([]);
+    });
+  });
   
   it('must separate @real_users and names');
 });
