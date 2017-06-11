@@ -16,15 +16,16 @@ class IntentHandler {
       let usersIdToAdd = Array.from(new Set(entities.users));
       
       // fetch users based on entities from message
-      return this.getKnownAndUnknownUsers(usersIdToAdd)
-      .then(({knownUsers, unknownUsers}) => {
+      this.list[context.channel] = this.list[context.channel] || new Set();
+      return this.classifyUsers(usersIdToAdd, this.list[context.channel])
+      .then(({knownUsers, unknownUsers, duplicateUsers}) => {
         // add ids to our list
-        this.list[context.channel] = this.list[context.channel] || [];
         // FIXME should use Set instead of array
-        knownUsers.forEach((id) => this.list[context.channel].push(id));
-        unknownUsers.forEach((id) => this.list[context.channel].push(id));
+        knownUsers.forEach((id) => this.list[context.channel].add(id));
+        unknownUsers.forEach((id) => this.list[context.channel].add(id));
 
         // answer the requestor
+        // TODO add message on duplicate users
         if (unknownUsers.length) {
           this.client.messageChannel(`I added ${knownUsers.length + unknownUsers.length}. I don't know who ${unknownUsers.join(', ')} are, but I added them anyways.`, context.userId);
           this.client.messageChannel(`You can say "remove users ${unknownUsers.join(' ')}" to remove them.`);
@@ -40,7 +41,7 @@ class IntentHandler {
     }
   }
 
-  getKnownAndUnknownUsers(usersIdToAdd) {
+  classifyUsers(usersIdToAdd, list) {
     return this.client.getUsers()
     .then((response) => {
       if (!response.ok) {
@@ -61,9 +62,15 @@ class IntentHandler {
       // add users to our list. keep track of unknown users
       let unknownUsers = [];
       let knownUsers = [];
+      let duplicateUsers = [];
       usersToAdd.forEach(result => {
         let id;
-        if (result.user) {
+        // FIXME need to separate @usertext and "usertext"
+        if (list.has(result.user.name)) {
+          duplicateUsers.push(result.user.name);
+        } else if (list.has(result.text)) {
+          duplicateUsers.push(result.text);
+        } else if (result.user) {
           id = result.user.name;
           knownUsers.push(id);
         } else {
@@ -74,7 +81,8 @@ class IntentHandler {
       
       return Promise.resolve({
         knownUsers,
-        unknownUsers 
+        unknownUsers,
+        duplicateUsers
       });
     });
   }

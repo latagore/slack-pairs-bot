@@ -35,7 +35,7 @@ describe('intent handlers', function() {
     ).then(function () {
       expect(client.getUsers.calledOnce).to.be.true;
       expect(client.messageChannel.called).to.be.true;
-      expect(ih.list[channel]).to.be.deep.equal(addUsersList1);
+      expect(Array.from(ih.list[channel])).to.be.deep.equal(addUsersList1);
       
       client.getUsers.resetHistory();
       client.messageChannel.reset();
@@ -48,7 +48,7 @@ describe('intent handlers', function() {
     }).then(function () {
       expect(client.getUsers.calledOnce).to.be.true;
       expect(client.messageChannel.called).to.be.true;
-      expect(ih.list[channel])
+      expect(Array.from(ih.list[channel]))
         .to.be.deep.equal(addUsersList1.concat(addUsersList2));
     });
   });
@@ -83,8 +83,21 @@ describe('intent handlers', function() {
     ).then(function () {
       expect(client.getUsers.calledOnce).to.be.true;
       expect(client.messageChannel.called).to.be.true;
-      expect(ih.list[channel]).to.be.deep.equal(uniqueList);
-      expect(ih.list[channel]).to.be.not.deep.equal(addUsersList);
+      expect(Array.from(ih.list[channel])).to.be.deep.equal(uniqueList);
+      expect(Array.from(ih.list[channel])).to.be.not.deep.equal(addUsersList);
+      
+      client.getUsers.resetHistory();
+      client.messageChannel.reset();
+    }).then(function () {
+      return ih.handleIntent(
+        "addUserCommand",
+        { users: addUsersList },
+        { channel: channel }
+      );
+    }).then(function () {
+      expect(client.getUsers.calledOnce).to.be.true;
+      expect(client.messageChannel.called).to.be.true;
+      expect(Array.from(ih.list[channel])).to.be.deep.equal(uniqueList);
     });
   });
 });
