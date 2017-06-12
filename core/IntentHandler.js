@@ -51,12 +51,12 @@ class IntentHandler {
         })
         .catch((err) => {
           console.error(err);
-          this.client.messageChannel(`Something went wrong. Let our software monkeys know that this bot has malfunctioned.`);
+          this.client.messageChannel(`Something went wrong. Let our software monkeys know that this bot has malfunctioned.`, context.userId);
         });
       }
     } else if (intent === "removeUserCommand") {
       if (!entities.users.length) {
-        this.client.messageChannel('I didn\'t see any names to remove. You can try something similar to "remove users @joe @bob".');
+        this.client.messageChannel('I didn\'t see any names to remove. You can try something similar to "remove users @joe @bob".', context.userId);
       }
       
       let usersIdToRemove = Array.from(new Set(entities.users));
@@ -76,7 +76,7 @@ class IntentHandler {
         this.client.messageChannel(`I removed ${removedUsers.join(', ')} from my list.`);
       }
       if (unknownUsers.length) {
-        this.client.messageChannel(`Hm... My list doesn't have ${unknownUsers.join(', ')}. You can see who's in my list with "list users".`);
+        this.client.messageChannel(`Hm... My list doesn't have ${unknownUsers.join(', ')}. You can see who's in my list with "list users".`, context.userId);
       }
     } else if (intent === "listUsersCommand") {
       let users = Array.from(this.list[context.channel]);
@@ -86,11 +86,11 @@ class IntentHandler {
       shuffle(users);
       
       if (users.length === 0) {
-        this.client.messageChannel('Currently, there are no users in my list. Try adding more people with "add users @joe @bob".');
+        this.client.messageChannel('Currently, there are no users in my list. Try adding more people with "add users @joe @bob".', context.userId);
       } else if (users.length === 1) {
-        this.client.messageChannel('I can\'t pair just a single person! Try adding more people with "add users @joe @bob".');
+        this.client.messageChannel('I can\'t pair just a single person! Try adding more people with "add users @joe @bob".', context.userId);
       } else if (users.length === 2) {
-        this.client.messageChannel(`:) I paired your pair: ${users.join(', ')}`);
+        this.client.messageChannel(`:) I paired your pair, but you should probably add more users: ${users.join(', ')}`, context.userId);
       } else {
         const groups = [];
         while (users.length > 3) {
