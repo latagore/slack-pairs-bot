@@ -16,7 +16,7 @@ describe('intent handlers', function() {
             { name: "alice" },
           ]
         })),
-      messageChannel: sinon.spy()  
+      messageChannel: sinon.spy(console.log)  
     };
     
     var addUsersList1 = ["joe", "bob"];
@@ -64,7 +64,7 @@ describe('intent handlers', function() {
             { name: "alice" },
           ]
         })),
-      messageChannel: sinon.spy()  
+      messageChannel: sinon.spy(console.log)  
     };
     
     var addUsersList = ["joe", "joe"];
@@ -112,7 +112,7 @@ describe('intent handlers', function() {
             { name: "alice" },
           ]
         })),
-      messageChannel: sinon.spy()  
+      messageChannel: sinon.spy(console.log)  
     };
     
     var addUsersList = ["joe"];
@@ -129,7 +129,7 @@ describe('intent handlers', function() {
         { users: emptyUsersList },
         { channel: channel }
     ).then(function () {
-      expect(client.getUsers.calledOnce).to.be.true;
+      expect(client.getUsers.called).to.be.false;
       expect(client.messageChannel.called).to.be.true;
       expect(Array.from(ih.list[channel])).to.be.deep.equal(emptyUsersList);
       
@@ -155,7 +155,7 @@ describe('intent handlers', function() {
         { channel: channel }
       );
     }).then(function () {
-      expect(client.getUsers.calledOnce).to.be.true;
+      expect(client.getUsers.called).to.be.false;
       expect(client.messageChannel.called).to.be.true;
       expect(Array.from(ih.list[channel])).to.be.deep.equal(addUsersList);
     });
@@ -163,7 +163,7 @@ describe('intent handlers', function() {
   
   it('must remove users', function() {
     var client = {
-      messageChannel: sinon.spy()  
+      messageChannel: sinon.spy(console.log)  
     };
     
     var addUsersList1 = ["joe", "bob"];
