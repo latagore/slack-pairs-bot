@@ -198,5 +198,25 @@ describe('intent handlers', function() {
   
   it('must accept removing users from an empty channel gracefully');
   
+  it('must list users', function () {
+    var client = {
+      messageChannel: sinon.spy(console.log)  
+    };
+    
+    var channel = 'someChannel';
+    var ih = new IntentHandler(client);
+    ih.list[channel] = new Set(["joe", "bob", "alice"]);
+    
+    return ih.handleIntent(
+      "listUsersCommand",
+      {},
+      { channel: channel }
+    ).then(function () {
+      expect(client.messageChannel.calledOnce).to.be.true;
+      // TODO need to revisit this...
+    });
+    
+  });
+  
   it('must separate @real_users and names');
 });
