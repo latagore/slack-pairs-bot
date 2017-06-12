@@ -80,7 +80,14 @@ class IntentHandler {
       }
     } else if (intent === "listUsersCommand") {
       let users = Array.from(this.list[context.channel]);
-      this.client.messageChannel(`I have ${users.length} people in my list. They are: /${users.join(", ")}/.`);
+      
+      if (users.length > 1) {
+        this.client.messageChannel(`I have ${users.length} people in my list. They are: /${users.join(", ")}/.`);
+      } else if (users.length === 1) {
+        this.client.messageChannel(`I have one person in my list: /${users.join(", ")}/.`);
+      } else {
+        this.client.messageChannel(`I have no people in my list. Try "add users @joe @bob" to add some.`);
+      }
     } else if (intent === "pairUsersCommand") {
       let users = Array.from(this.list[context.channel]);
       shuffle(users);
