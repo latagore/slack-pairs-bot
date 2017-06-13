@@ -136,8 +136,12 @@ class IntentHandler {
       // look up each user id that the messager asked to add
       // will be undefined if that user id doesn't exist
       let usersToAdd = usersIdToAdd.map(text => {
-        const result = { user: userMap[text], text };
-        return result;
+        if (text.startsWith("@")) {
+          text = text.slice(1); // remove @ prefix
+          const result = { user: userMap[text], text };
+          return result;
+        }
+        return {text}; // FIXME need to revisit this...
       });
 
       // add users to our list. keep track of unknown users
@@ -146,13 +150,13 @@ class IntentHandler {
       let duplicateUsers = [];
       usersToAdd.forEach(result => {
         let id;
-        // FIXME need to separate @usertext and "usertext"
-        if (result.user && list.has(result.user.name)) {
-          duplicateUsers.push(result.user.name);
+        // FIXME change to nested ifs
+        if (result.user && list.has("@" + result.user.name)) {
+          duplicateUsers.push("@" + result.user.name);
         } else if (list.has(result.text)) {
           duplicateUsers.push(result.text);
         } else if (result.user) {
-          id = result.user.name;
+          id = "@" + result.user.name;
           knownUsers.push(id);
         } else {
           id = result.text;

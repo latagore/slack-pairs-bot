@@ -19,8 +19,8 @@ describe('intent handlers', function() {
       messageChannel: sinon.spy(console.log)  
     };
     
-    var addUsersList1 = ["joe", "bob"];
-    var addUsersList2 = ["alice"];
+    var addUsersList1 = ["@joe", "@bob"];
+    var addUsersList2 = ["@alice"];
     var channel = "someChannel";
     var ih = new IntentHandler(client);
     
@@ -66,7 +66,7 @@ describe('intent handlers', function() {
       messageChannel: sinon.spy(console.log)  
     };
     
-    var addUsersList = ["joe", "joe"];
+    var addUsersList = ["@joe", "@joe"];
     var uniqueList = Array.from(new Set(addUsersList));
     var channel = "someChannel";
     var ih = new IntentHandler(client);
@@ -114,7 +114,7 @@ describe('intent handlers', function() {
       messageChannel: sinon.spy(console.log)  
     };
     
-    var addUsersList = ["joe"];
+    var addUsersList = ["@joe"];
     var emptyUsersList = [];
     var channel = "someChannel";
     var ih = new IntentHandler(client);
@@ -165,11 +165,11 @@ describe('intent handlers', function() {
       messageChannel: sinon.spy(console.log)  
     };
     
-    var addUsersList1 = ["joe", "bob"];
-    var addUsersList2 = ["alice"];
+    var addUsersList1 = ["@joe", "@bob"];
+    var addUsersList2 = ["@alice"];
     var channel = "someChannel";
     var ih = new IntentHandler(client);
-    ih.list[channel] = new Set(["joe", "bob", "alice"]);
+    ih.list[channel] = new Set(["@joe", "@bob", "@alice"]);
     
     
     expect(client.messageChannel.called).to.be.false;
@@ -180,7 +180,7 @@ describe('intent handlers', function() {
       { channel: channel }
     ).then(function () {
       expect(client.messageChannel.called).to.be.true;
-      expect(Array.from(ih.list[channel])).to.be.deep.equal(["alice"]);
+      expect(Array.from(ih.list[channel])).to.be.deep.equal(["@alice"]);
       
       client.messageChannel.reset();
     }).then(function () {
@@ -204,7 +204,7 @@ describe('intent handlers', function() {
     
     var channel = 'someChannel';
     var ih = new IntentHandler(client);
-    ih.list[channel] = new Set(["joe", "bob", "alice"]);
+    ih.list[channel] = new Set(["@joe", "@bob", "@alice"]);
     
     return ih.handleIntent(
       "listUsersCommand",
@@ -224,7 +224,7 @@ describe('intent handlers', function() {
     
     var channel = 'someChannel';
     var ih = new IntentHandler(client);
-    ih.list[channel] = new Set(["joe", "bob", "alice", "karen", "ali", "fatima", "lee"]);
+    ih.list[channel] = new Set(["@joe", "@bob", "@alice", "@karen", "@ali", "@fatima", "@lee"]);
     
     return ih.handleIntent(
       "pairUsersCommand",
@@ -243,9 +243,9 @@ describe('intent handlers', function() {
         sinon.stub().returns(Promise.resolve({
           ok: true,
           members: [
-            { name: "@joe" },
-            { name: "@bob" },
-            { name: "@alice" },
+            { name: "joe" },
+            { name: "bob" },
+            { name: "alice" },
           ]
         })),
       messageChannel: sinon.spy(console.log)  
