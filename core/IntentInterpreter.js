@@ -5,6 +5,7 @@ module.exports = function (message) {
   let intent;
   let entities;
   
+  message = message.trim();
   if (startsWith(message, utils.BOT_NAME)) {
     message = message.replace(new RegExp(utils.BOT_NAME + "\\s+"), '');
   } else {
