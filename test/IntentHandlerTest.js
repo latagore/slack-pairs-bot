@@ -237,5 +237,50 @@ describe('intent handlers', function() {
     });
   });
   
-  it('must separate @real_users and names');
+  it('must separate @real_users and names', function () {
+    var client = {
+      getUsers: 
+        sinon.stub().returns(Promise.resolve({
+          ok: true,
+          members: [
+            { name: "@joe" },
+            { name: "@bob" },
+            { name: "@alice" },
+          ]
+        })),
+      messageChannel: sinon.spy(console.log)  
+    };
+    
+    var addUsersList1 = ["@joe", "@bob"];
+    var addUsersList2 = ["alice", "@alice"];
+    var channel = "someChannel";
+    var ih = new IntentHandler(client);
+    
+    expect(client.getUsers.called).to.be.false;
+    expect(client.messageChannel.called).to.be.false;
+    
+    return ih.handleIntent(
+      "addUserCommand",
+      { users: addUsersList1 },
+      { channel: channel }
+    ).then(function () {
+      expect(client.getUsers.calledOnce).to.be.true;
+      expect(client.messageChannel.called).to.be.true;
+      expect(Array.from(ih.list[channel])).to.be.deep.equal(addUsersList1);
+      
+      client.getUsers.resetHistory();
+      client.messageChannel.reset();
+    }).then(function () {
+      return ih.handleIntent(
+        "addUserCommand",
+        { users: addUsersList2 },
+        { channel: channel }
+      );
+    }).then(function () {
+      expect(client.getUsers.calledOnce).to.be.true;
+      expect(client.messageChannel.called).to.be.true;
+      expect(ih.list[channel])
+        .to.be.deep.equal(new Set(addUsersList1.concat(addUsersList2)));
+    });
+  });
 });

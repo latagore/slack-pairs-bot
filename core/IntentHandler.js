@@ -43,10 +43,10 @@ class IntentHandler {
           // answer the requestor
           // TODO add message on duplicate users
           if (unknownUsers.length) {
-            this.client.messageChannel(`I added ${knownUsers.length + unknownUsers.length}. I don't know who ${unknownUsers.join(', ')} are, but I added them anyways.`, context.userId);
+            this.client.messageChannel(`I added ${knownUsers.length + unknownUsers.length} people. I don't know who ${unknownUsers.join(', ')} are, but I added them anyways.`, context.userId);
             this.client.messageChannel(`You can say "remove users ${unknownUsers.join(' ')}" to remove them.`);
           } else {
-            this.client.messageChannel(`I added ${knownUsers.length} users!`, context.userId);
+            this.client.messageChannel(`I added ${knownUsers.length} people!`, context.userId);
           }
         })
         .catch((err) => {
@@ -147,7 +147,7 @@ class IntentHandler {
       usersToAdd.forEach(result => {
         let id;
         // FIXME need to separate @usertext and "usertext"
-        if (list.has(result.user.name)) {
+        if (result.user && list.has(result.user.name)) {
           duplicateUsers.push(result.user.name);
         } else if (list.has(result.text)) {
           duplicateUsers.push(result.text);
