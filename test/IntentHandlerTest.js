@@ -24,7 +24,6 @@ describe('intent handlers', function() {
     var channel = "someChannel";
     var ih = new IntentHandler(client);
     
-    
     expect(client.getUsers.called).to.be.false;
     expect(client.messageChannel.called).to.be.false;
     
@@ -214,8 +213,28 @@ describe('intent handlers', function() {
     ).then(function () {
       expect(client.messageChannel.calledOnce).to.be.true;
       // TODO need to revisit this...
+      // doesn't really do anything
     });
+  });
+  
+  it('must pair users', function () {
+    var client = {
+      messageChannel: sinon.spy(console.log)  
+    };
     
+    var channel = 'someChannel';
+    var ih = new IntentHandler(client);
+    ih.list[channel] = new Set(["joe", "bob", "alice", "karen", "ali", "fatima", "lee"]);
+    
+    return ih.handleIntent(
+      "pairUsersCommand",
+      {},
+      { channel: channel }
+    ).then(function () {
+      expect(client.messageChannel.calledOnce).to.be.true;
+      // TODO need to revisit this...
+      // doesn't really do anything
+    });
   });
   
   it('must separate @real_users and names');
