@@ -27,14 +27,14 @@ class IntentHandler {
     // actual message?
     this.list[context.channel] = this.list[context.channel] || new Set();
     
-    const actions = [];
+    let action;
     const promise = new Promise();
     
     if (intent === "addUserCommand") {
       let usersIdToAdd = Array.from(new Set(entities.users));
       
       if (!entities.users.length) {
-        actions.push({intent: "warnNoUsersToAdd"});
+        action = {intent: "warnNoUsersToAdd"};
       } else {
         // fetch users based on entities from message
         this.classifyUsers(usersIdToAdd, this.list[context.channel])
@@ -44,19 +44,19 @@ class IntentHandler {
           knownUsers.forEach((id) => this.list[context.channel].add(id));
           unknownUsers.forEach((id) => this.list[context.channel].add(id));
 
-          actions.push({intent: "informAddStatus", entities: {unknownUsers, knownUsers, duplicateUsers}});
+          action = {intent: "informAddStatus", entities: {unknownUsers, knownUsers, duplicateUsers}};
           
-          promise.resolve(actions);
+          promise.resolve(action);
         })
         .catch((err) => {
           console.error(err);
-          actions.push({intent: "exceptionThrown"});
-          promise.resolve(actions);
+          action = {intent: "exceptionThrown"};
+          promise.resolve(action);
         });
       }
     } else if (intent === "removeUserCommand") {
       if (!entities.users.length) {
-        actions.push({intent: "warnNoUsersToRemove"});
+        action = {intent: "warnNoUsersToRemove"};
       }
       
       let usersIdToRemove = Array.from(new Set(entities.users));
@@ -73,20 +73,20 @@ class IntentHandler {
       });
       
       // FIXME should include duplicate users
-      actions.push({intent: "informRemoveStatus", entities: {removedUsers, unknownUsers}});
+      action = {intent: "informRemoveStatus", entities: {removedUsers, unknownUsers}};
       
-      promise.resolve(actions);
+      promise.resolve(action);
     } else if (intent === "listUsersCommand") {
       let users = Array.from(this.list[context.channel]);
       
-      actions.push({intent: "informListStatus", entities: {users}});
-      promise.resolve(actions);
+      action = {intent: "informListStatus", entities: {users}};
+      promise.resolve(action);
     } else if (intent === "pairUsersCommand") {
       let users = Array.from(this.list[context.channel]);
       shuffle(users);
       
       if (users.length <= 3) {
-        actions.push({intent:"warnNotEnoughUsersToPair"});
+        action = {intent:"warnNotEnoughUsersToPair"};
       } else {
         const groups = [];
         while (users.length > 3) {
@@ -101,9 +101,11 @@ class IntentHandler {
         // whether it has 2 or 3 people
         groups.push(users);
         
-        actions.push({intent: "pairUserStatus", entities: {groups}});
+        action = {intent: "pairUserStatus", entities: {groups}};
       }
-      promise.resolve(actions);
+      promise.resolve(action);
+    } else {
+      promise.resolve();
     }
     
     return promise;
