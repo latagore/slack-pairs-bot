@@ -1,3 +1,5 @@
+const translator = require("../BotIntentTranslator");
+
 /**
  * Shuffles array in place. ES6 version
  * From https://stackoverflow.com/a/6274381
@@ -25,38 +27,36 @@ class IntentHandler {
     // actual message?
     this.list[context.channel] = this.list[context.channel] || new Set();
     
+    const actions = [];
+    const promise = new Promise();
+    
     if (intent === "addUserCommand") {
       let usersIdToAdd = Array.from(new Set(entities.users));
       
       if (!entities.users.length) {
-        this.client.messageChannel('I didn\'t see any names to add. You can try something similar to "add users @joe @bob".');
+        actions.push({intent: "warnNoUsersToAdd"});
       } else {
-      
         // fetch users based on entities from message
-        return this.classifyUsers(usersIdToAdd, this.list[context.channel])
+        this.classifyUsers(usersIdToAdd, this.list[context.channel])
         .then(({knownUsers, unknownUsers, duplicateUsers}) => {
           // add ids to our list
           // FIXME should use Set instead of array
           knownUsers.forEach((id) => this.list[context.channel].add(id));
           unknownUsers.forEach((id) => this.list[context.channel].add(id));
 
-          // answer the requestor
-          // TODO add message on duplicate users
-          if (unknownUsers.length) {
-            this.client.messageChannel(`I added ${knownUsers.length + unknownUsers.length} people. I don't know who ${unknownUsers.join(', ')} are, but I added them anyways.`, context.userId);
-            this.client.messageChannel(`You can say "remove users ${unknownUsers.join(' ')}" to remove them.`);
-          } else {
-            this.client.messageChannel(`I added ${knownUsers.length} people!`, context.userId);
-          }
+          actions.push({intent: "informAddStatus", entities: {unknownUsers, knownUsers, duplicateUsers}});
+          
+          promise.resolve(actions);
         })
         .catch((err) => {
           console.error(err);
-          this.client.messageChannel(`Something went wrong. Let our software monkeys know that this bot has malfunctioned.`, context.userId);
+          actions.push({intent: "exceptionThrown"});
+          promise.resolve(actions);
         });
       }
     } else if (intent === "removeUserCommand") {
       if (!entities.users.length) {
-        this.client.messageChannel('I didn\'t see any names to remove. You can try something similar to "remove users @joe @bob".', context.userId);
+        actions.push({intent: "warnNoUsersToRemove"});
       }
       
       let usersIdToRemove = Array.from(new Set(entities.users));
@@ -72,32 +72,21 @@ class IntentHandler {
         }
       });
       
-      if (removedUsers.length) {
-        this.client.messageChannel(`I removed ${removedUsers.join(', ')} from my list.`);
-      }
-      if (unknownUsers.length) {
-        this.client.messageChannel(`Hm... My list doesn't have ${unknownUsers.join(', ')}. You can see who's in my list with "list users".`, context.userId);
-      }
+      // FIXME should include duplicate users
+      actions.push({intent: "informRemoveStatus", entities: {removedUsers, unknownUsers}});
+      
+      promise.resolve(actions);
     } else if (intent === "listUsersCommand") {
       let users = Array.from(this.list[context.channel]);
       
-      if (users.length > 1) {
-        this.client.messageChannel(`I have ${users.length} people in my list. They are: /${users.join(", ")}/.`);
-      } else if (users.length === 1) {
-        this.client.messageChannel(`I have one person in my list: /${users.join(", ")}/.`);
-      } else {
-        this.client.messageChannel(`I have no people in my list. Try "add users @joe @bob" to add some.`);
-      }
+      actions.push({intent: "informListStatus", entities: {users}});
+      promise.resolve(actions);
     } else if (intent === "pairUsersCommand") {
       let users = Array.from(this.list[context.channel]);
       shuffle(users);
       
-      if (users.length === 0) {
-        this.client.messageChannel('Currently, there are no users in my list. Try adding more people with "add users @joe @bob".', context.userId);
-      } else if (users.length === 1) {
-        this.client.messageChannel('I can\'t pair just a single person! Try adding more people with "add users @joe @bob".', context.userId);
-      } else if (users.length === 2) {
-        this.client.messageChannel(`:) I paired your pair, but you should probably add more users: ${users.join(', ')}`, context.userId);
+      if (users.length <= 3) {
+        actions.push({intent:"warnNotEnoughUsersToPair"});
       } else {
         const groups = [];
         while (users.length > 3) {
@@ -112,14 +101,12 @@ class IntentHandler {
         // whether it has 2 or 3 people
         groups.push(users);
         
-        let groupsString = groups
-          .map(group => group.join(' - '))
-          .join("\n");
-        this.client.messageChannel(`Here are your pairs: \`\`\`${groupsString}\`\`\``);
+        actions.push({intent: "pairUserStatus", entities: {groups}});
       }
+      promise.resolve(actions);
     }
     
-    return Promise.resolve();
+    return promise;
   }
 
   classifyUsers(usersIdToAdd, list) {
