@@ -1,5 +1,3 @@
-const translator = require("../BotIntentTranslator");
-
 /**
  * Shuffles array in place. ES6 version
  * From https://stackoverflow.com/a/6274381
@@ -28,85 +26,87 @@ class IntentHandler {
     this.list[context.channel] = this.list[context.channel] || new Set();
     
     let action;
-    const promise = new Promise();
-    
-    if (intent === "addUserCommand") {
-      let usersIdToAdd = Array.from(new Set(entities.users));
-      
-      if (!entities.users.length) {
-        action = {intent: "warnNoUsersToAdd"};
-      } else {
-        // fetch users based on entities from message
-        this.classifyUsers(usersIdToAdd, this.list[context.channel])
-        .then(({knownUsers, unknownUsers, duplicateUsers}) => {
-          // add ids to our list
-          // FIXME should use Set instead of array
-          knownUsers.forEach((id) => this.list[context.channel].add(id));
-          unknownUsers.forEach((id) => this.list[context.channel].add(id));
+    const promise = new Promise((resolve, reject) => {
 
-          action = {intent: "informAddStatus", entities: {unknownUsers, knownUsers, duplicateUsers}};
-          
-          promise.resolve(action);
-        })
-        .catch((err) => {
-          console.error(err);
-          action = {intent: "exceptionThrown"};
-          promise.resolve(action);
-        });
-      }
-    } else if (intent === "removeUserCommand") {
-      if (!entities.users.length) {
-        action = {intent: "warnNoUsersToRemove"};
-      }
-      
-      let usersIdToRemove = Array.from(new Set(entities.users));
-      
-      const removedUsers = [];
-      const unknownUsers = [];
-      usersIdToRemove.forEach(userId => {
-        if (this.list[context.channel].has(userId)) {
-          removedUsers.push(userId);
-          this.list[context.channel].delete(userId);
+      if (intent === "addUserCommand") {
+        let usersIdToAdd = Array.from(new Set(entities.users));
+
+        if (!entities.users.length) {
+          action = {intent: "warnNoUsersToAdd"};
+          resolve(action);
         } else {
-          unknownUsers.push(userId);
+          // fetch users based on entities from message
+          this.classifyUsers(usersIdToAdd, this.list[context.channel])
+          .then(({knownUsers, unknownUsers, duplicateUsers}) => {
+            // add ids to our list
+            // FIXME should use Set instead of array
+            knownUsers.forEach((id) => this.list[context.channel].add(id));
+            unknownUsers.forEach((id) => this.list[context.channel].add(id));
+
+            action = {intent: "informAddStatus", entities: {unknownUsers, knownUsers, duplicateUsers}};
+
+            resolve(action);
+          })
+          .catch((err) => {
+            console.error(err);
+            action = {intent: "exceptionThrown"};
+            resolve(action);
+          });
         }
-      });
-      
-      // FIXME should include duplicate users
-      action = {intent: "informRemoveStatus", entities: {removedUsers, unknownUsers}};
-      
-      promise.resolve(action);
-    } else if (intent === "listUsersCommand") {
-      let users = Array.from(this.list[context.channel]);
-      
-      action = {intent: "informListStatus", entities: {users}};
-      promise.resolve(action);
-    } else if (intent === "pairUsersCommand") {
-      let users = Array.from(this.list[context.channel]);
-      shuffle(users);
-      
-      if (users.length <= 3) {
-        action = {intent:"warnNotEnoughUsersToPair"};
+      } else if (intent === "removeUserCommand") {
+        if (!entities.users.length) {
+          action = {intent: "warnNoUsersToRemove"};
+        }
+
+        let usersIdToRemove = Array.from(new Set(entities.users));
+
+        const removedUsers = [];
+        const unknownUsers = [];
+        usersIdToRemove.forEach(userId => {
+          if (this.list[context.channel].has(userId)) {
+            removedUsers.push(userId);
+            this.list[context.channel].delete(userId);
+          } else {
+            unknownUsers.push(userId);
+          }
+        });
+
+        // FIXME should include duplicate users
+        action = {intent: "informRemoveStatus", entities: {removedUsers, unknownUsers}};
+
+        resolve(action);
+      } else if (intent === "listUsersCommand") {
+        let users = Array.from(this.list[context.channel]);
+
+        action = {intent: "informListStatus", entities: {users}};
+        resolve(action);
+      } else if (intent === "pairUsersCommand") {
+        let users = Array.from(this.list[context.channel]);
+        shuffle(users);
+
+        if (users.length <= 3) {
+          action = {intent:"warnNotEnoughUsersToPair"};
+        } else {
+          const groups = [];
+          while (users.length > 3) {
+            const pair = [];
+            pair.push(users.pop());
+            pair.push(users.pop());
+
+            groups.push(pair);
+          }
+
+          // add remaining people in one group
+          // whether it has 2 or 3 people
+          groups.push(users);
+
+          action = {intent: "pairUserStatus", entities: {groups}};
+        }
+        resolve(action);
       } else {
-        const groups = [];
-        while (users.length > 3) {
-          const pair = [];
-          pair.push(users.pop());
-          pair.push(users.pop());
-          
-          groups.push(pair);
-        }
-        
-        // add remaining people in one group
-        // whether it has 2 or 3 people
-        groups.push(users);
-        
-        action = {intent: "pairUserStatus", entities: {groups}};
+        resolve();
       }
-      promise.resolve(action);
-    } else {
-      promise.resolve();
-    }
+    });
     
     return promise;
   }

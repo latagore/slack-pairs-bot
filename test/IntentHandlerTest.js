@@ -15,40 +15,50 @@ describe('intent handlers', function() {
             { name: "bob" },
             { name: "alice" },
           ]
-        })),
-      messageChannel: sinon.spy(console.log)  
+        }))
     };
     
     var addUsersList1 = ["@joe", "@bob"];
     var addUsersList2 = ["@alice"];
+    var expectedAction1 = {
+      intent: "informAddStatus",
+      entities: {
+        unknownUsers: [],
+        duplicateUsers: [],
+        knownUsers: addUsersList1
+      }
+    };
+    var expectedAction2 = {
+      intent: "informAddStatus",
+      entities: {
+        unknownUsers: [],
+        duplicateUsers: [],
+        knownUsers: addUsersList2
+      }
+    };
     var channel = "someChannel";
     var ih = new IntentHandler(client);
     
     expect(client.getUsers.called).to.be.false;
-    expect(client.messageChannel.called).to.be.false;
     
     return ih.handleIntent(
       "addUserCommand",
       { users: addUsersList1 },
       { channel: channel }
-    ).then(function () {
+    ).then(function (action) {
       expect(client.getUsers.calledOnce).to.be.true;
-      expect(client.messageChannel.called).to.be.true;
-      expect(Array.from(ih.list[channel])).to.be.deep.equal(addUsersList1);
+      expect(action).to.be.deep.equal(expectedAction1);
       
       client.getUsers.resetHistory();
-      client.messageChannel.reset();
     }).then(function () {
       return ih.handleIntent(
         "addUserCommand",
         { users: addUsersList2 },
         { channel: channel }
       );
-    }).then(function () {
+    }).then(function (action) {
       expect(client.getUsers.calledOnce).to.be.true;
-      expect(client.messageChannel.called).to.be.true;
-      expect(Array.from(ih.list[channel]))
-        .to.be.deep.equal(addUsersList1.concat(addUsersList2));
+      expect(action).to.be.deep.equal(expectedAction2);
     });
   });
   
@@ -62,41 +72,51 @@ describe('intent handlers', function() {
             { name: "bob" },
             { name: "alice" },
           ]
-        })),
-      messageChannel: sinon.spy(console.log)  
+        }))
     };
     
     var addUsersList = ["@joe", "@joe"];
     var uniqueList = Array.from(new Set(addUsersList));
+    var expectedAction1 = {
+      intent: "informAddStatus",
+      entities: {
+        unknownUsers: [],
+        duplicateUsers: [],
+        knownUsers: uniqueList
+      }
+    };
+    var expectedAction2 = {
+      intent: "informAddStatus",
+      entities: {
+        unknownUsers: [],
+        duplicateUsers: uniqueList,
+        knownUsers: []
+      }
+    };
     var channel = "someChannel";
     var ih = new IntentHandler(client);
     
     
     expect(client.getUsers.called).to.be.false;
-    expect(client.messageChannel.called).to.be.false;
     
     return ih.handleIntent(
       "addUserCommand",
       { users: addUsersList },
       { channel: channel }
-    ).then(function () {
+    ).then(function (action) {
       expect(client.getUsers.calledOnce).to.be.true;
-      expect(client.messageChannel.called).to.be.true;
-      expect(Array.from(ih.list[channel])).to.be.deep.equal(uniqueList);
-      expect(Array.from(ih.list[channel])).to.be.not.deep.equal(addUsersList);
+      expect(action).to.be.deep.equal(expectedAction1);
       
       client.getUsers.resetHistory();
-      client.messageChannel.reset();
     }).then(function () {
       return ih.handleIntent(
         "addUserCommand",
         { users: addUsersList },
         { channel: channel }
       );
-    }).then(function () {
+    }).then(function (action) {
       expect(client.getUsers.calledOnce).to.be.true;
-      expect(client.messageChannel.called).to.be.true;
-      expect(Array.from(ih.list[channel])).to.be.deep.equal(uniqueList);
+      expect(action).to.be.deep.equal(expectedAction2);
     });
   });
   
@@ -110,53 +130,60 @@ describe('intent handlers', function() {
             { name: "bob" },
             { name: "alice" },
           ]
-        })),
-      messageChannel: sinon.spy(console.log)  
+        }))
     };
     
     var addUsersList = ["@joe"];
     var emptyUsersList = [];
+    var expectedAction1 = {
+      intent: "warnNoUsersToAdd"
+    };
+    var expectedAction2 = {
+      intent: "informAddStatus",
+      entities: {
+        unknownUsers: [],
+        duplicateUsers: [],
+        knownUsers: addUsersList
+      }
+    };
+    var expectedAction3 = {
+      intent: "warnNoUsersToAdd"
+    };
     var channel = "someChannel";
     var ih = new IntentHandler(client);
     
     
     expect(client.getUsers.called).to.be.false;
-    expect(client.messageChannel.called).to.be.false;
     
     return ih.handleIntent(
         "addUserCommand",
         { users: emptyUsersList },
         { channel: channel }
-    ).then(function () {
+    ).then(function (action) {
       expect(client.getUsers.called).to.be.false;
-      expect(client.messageChannel.called).to.be.true;
-      expect(Array.from(ih.list[channel])).to.be.deep.equal(emptyUsersList);
+      expect(action).to.be.deep.equal(expectedAction1);
       
       client.getUsers.resetHistory();
-      client.messageChannel.reset();
     }).then(function () {
       return ih.handleIntent(
         "addUserCommand",
         { users: addUsersList },
         { channel: channel }
       );
-    }).then(function () {
+    }).then(function (action) {
       expect(client.getUsers.calledOnce).to.be.true;
-      expect(client.messageChannel.called).to.be.true;
-      expect(Array.from(ih.list[channel])).to.be.deep.equal(addUsersList);
+      expect(action).to.be.deep.equal(expectedAction2);
       
       client.getUsers.resetHistory();
-      client.messageChannel.reset();
     }).then(function () {
       return ih.handleIntent(
         "addUserCommand",
         { users: emptyUsersList },
         { channel: channel }
       );
-    }).then(function () {
+    }).then(function (action) {
       expect(client.getUsers.called).to.be.false;
-      expect(client.messageChannel.called).to.be.true;
-      expect(Array.from(ih.list[channel])).to.be.deep.equal(addUsersList);
+      expect(action).to.be.deep.equal(expectedAction3);
     });
   });
   
@@ -167,6 +194,24 @@ describe('intent handlers', function() {
     
     var addUsersList1 = ["@joe", "@bob"];
     var addUsersList2 = ["@alice"];
+    
+    var expectedAction2 = {
+      intent: "informRemoveStatus",
+      entities: {
+        unknownUsers: [],
+        duplicateUsers: [],
+        knownUsers: addUsersList
+      }
+    };
+    var expectedAction2 = {
+      intent: "informRemoveStatus",
+      entities: {
+        unknownUsers: [],
+        duplicateUsers: [],
+        knownUsers: addUsersList
+      }
+    };
+    
     var channel = "someChannel";
     var ih = new IntentHandler(client);
     ih.list[channel] = new Set(["@joe", "@bob", "@alice"]);
