@@ -37,13 +37,13 @@ class IntentHandler {
         } else {
           // fetch users based on entities from message
           this.classifyUsers(usersIdToAdd, this.list[context.channel])
-          .then(({knownUsers, unknownUsers, duplicateUsers}) => {
+          .then(({knownUsers, unknownUsers, existingUsers}) => {
             // add ids to our list
             // FIXME should use Set instead of array
             knownUsers.forEach((id) => this.list[context.channel].add(id));
             unknownUsers.forEach((id) => this.list[context.channel].add(id));
 
-            action = {intent: "informAddStatus", entities: {unknownUsers, knownUsers, duplicateUsers}};
+            action = {intent: "informAddStatus", entities: {unknownUsers, knownUsers, existingUsers}};
 
             resolve(action);
           })
@@ -135,14 +135,14 @@ class IntentHandler {
       // add users to our list. keep track of unknown users
       let unknownUsers = [];
       let knownUsers = [];
-      let duplicateUsers = [];
+      let existingUsers = [];
       usersToAdd.forEach(result => {
         let id;
         // FIXME change to nested ifs
         if (result.user && list.has("@" + result.user.name)) {
-          duplicateUsers.push("@" + result.user.name);
+          existingUsers.push("@" + result.user.name);
         } else if (list.has(result.text)) {
-          duplicateUsers.push(result.text);
+          existingUsers.push(result.text);
         } else if (result.user) {
           id = "@" + result.user.name;
           knownUsers.push(id);
@@ -155,7 +155,7 @@ class IntentHandler {
       return Promise.resolve({
         knownUsers,
         unknownUsers,
-        duplicateUsers
+        existingUsers
       });
     });
   }

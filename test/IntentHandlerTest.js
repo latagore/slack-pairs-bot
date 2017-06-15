@@ -24,7 +24,7 @@ describe('intent handlers', function() {
       intent: "informAddStatus",
       entities: {
         unknownUsers: [],
-        : [],
+        existingUsers: [],
         knownUsers: addUsersList1
       }
     };
