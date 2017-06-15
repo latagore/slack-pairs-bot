@@ -100,7 +100,7 @@ class IntentHandler {
           // whether it has 2 or 3 people
           groups.push(users);
 
-          action = {intent: "pairUserStatus", entities: {groups}};
+          action = {intent: "informPairStatus", entities: {groups}};
         }
         resolve(action);
       } else {
