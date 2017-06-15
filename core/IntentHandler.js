@@ -71,7 +71,6 @@ class IntentHandler {
           }
         });
 
-        // FIXME should include duplicate users
         action = {intent: "informRemoveStatus", entities: {removedUsers, unknownUsers}};
 
         resolve(action);
