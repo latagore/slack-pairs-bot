@@ -24,7 +24,7 @@ describe('intent handlers', function() {
       intent: "informAddStatus",
       entities: {
         unknownUsers: [],
-        duplicateUsers: [],
+        : [],
         knownUsers: addUsersList1
       }
     };
@@ -32,7 +32,7 @@ describe('intent handlers', function() {
       intent: "informAddStatus",
       entities: {
         unknownUsers: [],
-        duplicateUsers: [],
+        existingUsers: [],
         knownUsers: addUsersList2
       }
     };
@@ -81,7 +81,7 @@ describe('intent handlers', function() {
       intent: "informAddStatus",
       entities: {
         unknownUsers: [],
-        duplicateUsers: [],
+        existingUsers: [],
         knownUsers: uniqueList
       }
     };
@@ -89,7 +89,7 @@ describe('intent handlers', function() {
       intent: "informAddStatus",
       entities: {
         unknownUsers: [],
-        duplicateUsers: uniqueList,
+        existingUsers: uniqueList,
         knownUsers: []
       }
     };
@@ -142,7 +142,7 @@ describe('intent handlers', function() {
       intent: "informAddStatus",
       entities: {
         unknownUsers: [],
-        duplicateUsers: [],
+        existingUsers: [],
         knownUsers: addUsersList
       }
     };
@@ -297,7 +297,7 @@ describe('intent handlers', function() {
       intent: "informAddStatus",
       entities: {
         unknownUsers: [],
-        duplicateUsers: [],
+        existingUsers: [],
         knownUsers: addUsersList1
       }
     };
@@ -305,7 +305,7 @@ describe('intent handlers', function() {
       intent: "informAddStatus",
       entities: {
         unknownUsers: ["alice"],
-        duplicateUsers: [],
+        existingUsers: [],
         knownUsers: ["@alice"]
       }
     };    
