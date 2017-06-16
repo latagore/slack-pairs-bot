@@ -1,4 +1,4 @@
-const utils = require('../utils');
+const utils = require('./utils.js');
 
 function englishJoinList(arr) {
   if (arr.length === 0) {
@@ -21,7 +21,7 @@ class BotintentTranslator {
   }
   
   warnNoUsersToAdd({context}) {
-    this.client.messageCHannel('I didn\'t see any names to add. You can try something similar to "${utils.BOT_NAME} add users @joe @bob".', context.request.userHandle); 
+    this.client.messageChannel('I didn\'t see any names to add. You can try something similar to "${utils.BOT_NAME} add users @joe @bob".', context.request.channelId, context.request.userHandle); 
   }
   
   informAddStatus({entities, context}) {
