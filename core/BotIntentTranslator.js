@@ -56,11 +56,11 @@ class BotintentTranslator {
   informListStatus({entities, context}) {
     const {users} = entities;
     if (!users.length) {
-      this.client.messageChannel(`I don't have any people in my list. You can try something similar to "${utils.BOT_NAME} add users @joe @bob" to add some.`);
+      this.client.messageChannel(`I don't have any people in my list. You can try something similar to "${utils.BOT_NAME} add users @joe @bob" to add some.`, context.request.channelId);
     } else if (users.length === 1) {
-      this.client.messageChannel(`${englishJoinList(users)} is the only person in my list.`);
+      this.client.messageChannel(`${englishJoinList(users)} is the only person in my list.`, context.request.channelId);
     } else {
-      this.client.messageChannel(`I have ${users.length} people in my list. They are: ${englishJoinList(users)}`);
+      this.client.messageChannel(`I have ${users.length} people in my list. They are: ${englishJoinList(users)}`, context.request.channelId);
     }
   }
   
