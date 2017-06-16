@@ -86,20 +86,5 @@ class BotintentTranslator {
     this.client.messageChannel(`Here are your pairs: \n${groupsString}`);
   }
 }
+
 module.exports = BotintentTranslator;
-//  if (users.length === 0) {
-//    this.client.messageChannel('Currently, there are no users in my list. Try adding more people with "add users @joe @bob".', context.userId);
-//  } else if (users.length === 1) {
-//    this.client.messageChannel('I can\'t pair just a single person! Try adding more people with "add users @joe @bob".', context.userId);
-//  } else if (users.length === 2) {
-//    this.client.messageChannel(`:) I paired your pair, but you should probably add more users: ${users.join(', ')}`, context.userId);
-//  } else {
-//
-//  }
-  
-  
-  // pair users
-//  let groupsString = groups
-//    .map(group => group.join(' - '))
-//    .join("\n");
-//  this.client.messageChannel(`Here are your pairs: \`\`\`${groupsString}\`\`\``);
