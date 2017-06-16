@@ -42,13 +42,13 @@ class BotintentTranslator {
   informRemoveStatus({entities, context}) {
     const {removedUsers, unknownUsers} = entities;
     if (removedUsers.length) {
-      this.client.messageChannel(`I removedUsers ${englishJoinList(removedUsers)}!`);
+      this.client.messageChannel(`I removedUsers ${englishJoinList(removedUsers)}!`, context.request.channelId);
     }
     if (unknownUsers.length) {
       if (unknownUsers.length === 1) {
-        this.client.messageChannel(`Note: ${englishJoinList(unknownUsers)} aren't in my list. Maybe you spelled their name wrong?`, context.request.userHandle);
+        this.client.messageChannel(`Note: ${englishJoinList(unknownUsers)} aren't in my list. Maybe you spelled their name wrong?`, context.request.channelId, context.request.userHandle);
       } else {
-        this.client.messageChannel(`Note: ${englishJoinList(unknownUsers)} isn't in my list. Maybe you spelled their name wrong?`, context.request.userHandle);
+        this.client.messageChannel(`Note: ${englishJoinList(unknownUsers)} isn't in my list. Maybe you spelled their name wrong?`, context.request.channelId, context.request.userHandle);
       }
     }
   }
