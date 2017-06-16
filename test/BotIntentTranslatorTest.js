@@ -26,6 +26,7 @@ describe('Bot intent translator', function () {
     expect(client.messageChannel.calledOnce).to.be.true;
     
     expect(messages[0].channelId).to.equal(context.request.channelId);
+    expect(messages[0].userId).to.equal(context.request.userHandle);
     // test that message indicates no names in message
     expect(messages[0].message).to.match(/I didn't see any names to add/);
   });
@@ -64,8 +65,11 @@ describe('Bot intent translator', function () {
     var translator = new BotIntentTranslator(client);
     
     translator.informAddStatus({entities: entities1, context: context});
+    
     expect(client.messageChannel.calledOnce).to.be.true;
     expect(messages[0].channelId).to.equal(context.request.channelId);
+    // don't need user handle for informational messages
+    expect(messages[0].userId).to.equal(undefined);
     // test that message indicates users to add
     expect(messages[0].message).to.match(/I added/);
     expect(messages[0].message).to.match(new RegExp(englishJoinList(userList)));
@@ -75,6 +79,7 @@ describe('Bot intent translator', function () {
     translator.informAddStatus({entities: entities2, context: context});
     expect(client.messageChannel.calledOnce).to.be.true;
     expect(messages[0].channelId).to.equal(context.request.channelId);
+    expect(messages[0].userId).to.equal(context.request.userHandle);
     // test that message indicates no names in message
     expect(messages[0].message).to.match(/already in my list/);
     expect(messages[0].message).to.match(new RegExp(englishJoinList(userList)));
@@ -84,10 +89,9 @@ describe('Bot intent translator', function () {
     translator.informAddStatus({entities: entities3, context: context});
     expect(client.messageChannel.calledOnce).to.be.true;
     expect(messages[0].channelId).to.equal(context.request.channelId);
+    expect(messages[0].userId).to.equal(context.request.userHandle);
     // test that message indicates it doesn't know added users
     expect(messages[0].message).to.match(/I don't know who/);
     expect(messages[0].message).to.match(new RegExp(englishJoinList(userList)));
   });
-  
-  
 });

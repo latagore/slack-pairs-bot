@@ -24,9 +24,9 @@ class BotintentTranslator {
     }
     if (existingUsers.length) {
       if (existingUsers.length === 1) {
-        this.client.messageChannel(`Note: ${englishJoinList(existingUsers)} is already in my list.`, context.request.channelId);
+        this.client.messageChannel(`Note: ${englishJoinList(existingUsers)} is already in my list.`, context.request.channelId, context.request.userHandle);
       } else {
-        this.client.messageChannel(`Note: ${englishJoinList(existingUsers)} are already in my list.`, context.request.channelId);
+        this.client.messageChannel(`Note: ${englishJoinList(existingUsers)} are already in my list.`, context.request.channelId, context.request.userHandle);
       }
     }
   }
