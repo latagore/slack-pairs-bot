@@ -36,7 +36,7 @@ class BotintentTranslator {
   }
   
   warnNoUsersToRemove({context}) {
-    this.client.messageChannel(`I didn\'t see any names to add. You can try something similar to "${utils.BOT_NAME} remove users @joe @bob".`, context.request.userHandle);
+    this.client.messageChannel(`I didn\'t see any names to remove. You can try something similar to "${utils.BOT_NAME} remove users @joe @bob".`, context.request.channelId, context.request.userHandle);
   }
   
   informRemoveStatus({entities, context}) {

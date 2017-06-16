@@ -35,7 +35,6 @@ describe('Bot intent translator', function () {
     var messages = [];
     var client = {
       messageChannel: sinon.spy(function (message, channelId, userId) {
-        console.log(message);
         messages.push({message: message, channelId: channelId, userId: userId});
       })
     };
@@ -93,5 +92,28 @@ describe('Bot intent translator', function () {
     // test that message indicates it doesn't know added users
     expect(messages[0].message).to.match(/I don't know who/);
     expect(messages[0].message).to.match(new RegExp(englishJoinList(userList)));
+  });
+  
+  it('must warn no users to remove', function () {
+    var messages = [];
+    var client = {
+      messageChannel: sinon.spy(function (message, channelId, userId) {
+        messages.push({message: message, channelId: channelId, userId: userId});
+      })
+    };
+    var context = {
+      request: {
+        userHandle: "testUser",
+        channelId: "someChannel"
+      }
+    };
+    var translator = new BotIntentTranslator(client);
+    translator.warnNoUsersToRemove({context: context});
+    expect(client.messageChannel.calledOnce).to.be.true;
+    
+    expect(messages[0].channelId).to.equal(context.request.channelId);
+    expect(messages[0].userId).to.equal(context.request.userHandle);
+    // test that message indicates no names in message
+    expect(messages[0].message).to.match(/I didn't see any names to remove/);
   });
 });
