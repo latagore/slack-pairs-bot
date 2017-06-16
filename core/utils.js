@@ -11,7 +11,7 @@ module.exports = {
       arr.slice(0, -1).forEach((x) => {
         result += x + ", ";
       });
-      result += " and " + arr[arr.length - 1];
+      result += "and " + arr[arr.length - 1];
       return result;
     }
   }

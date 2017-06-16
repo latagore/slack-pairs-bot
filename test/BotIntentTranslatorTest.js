@@ -34,6 +34,7 @@ describe('Bot intent translator', function () {
     var messages = [];
     var client = {
       messageChannel: sinon.spy(function (message, channelId, userId) {
+        console.log(message);
         messages.push({message: message, channelId: channelId, userId: userId});
       })
     };
@@ -43,17 +44,21 @@ describe('Bot intent translator', function () {
         channelId: "someChannel"
       }
     };
-    var addUsersList1 = ["@joe", "@bob"];
-    var addUsersList2 = ["@alice"];
+    var userList = ["@joe", "@bob"];
     var entities1 = {
       unknownUsers: [],
       existingUsers: [],
-      knownUsers: addUsersList1
+      knownUsers: userList
     };
     var entities2 = {
       unknownUsers: [],
+      existingUsers: userList,
+      knownUsers: []
+    };
+    var entities3 = {
+      unknownUsers: userList,
       existingUsers: [],
-      knownUsers: addUsersList2
+      knownUsers: []
     };
     
     var translator = new BotIntentTranslator(client);
@@ -62,7 +67,8 @@ describe('Bot intent translator', function () {
     expect(client.messageChannel.calledOnce).to.be.true;
     expect(messages[0].channelId).to.equal(context.request.channelId);
     // test that message indicates users to add
-    expect(messages[0].message).to.match(new RegExp(englishJoinList(entities1.knownUsers)));
+    expect(messages[0].message).to.match(/I added/);
+    expect(messages[0].message).to.match(new RegExp(englishJoinList(userList)));
     messages = [];
     client.messageChannel.reset();
     
@@ -70,7 +76,18 @@ describe('Bot intent translator', function () {
     expect(client.messageChannel.calledOnce).to.be.true;
     expect(messages[0].channelId).to.equal(context.request.channelId);
     // test that message indicates no names in message
-    expect(messages[0].message).to.match(new RegExp(englishJoinList(entities2.knownUsers)));
+    expect(messages[0].message).to.match(/already in my list/);
+    expect(messages[0].message).to.match(new RegExp(englishJoinList(userList)));
+    messages = [];
+    client.messageChannel.reset();
     
+    translator.informAddStatus({entities: entities3, context: context});
+    expect(client.messageChannel.calledOnce).to.be.true;
+    expect(messages[0].channelId).to.equal(context.request.channelId);
+    // test that message indicates it doesn't know added users
+    expect(messages[0].message).to.match(/I don't know who/);
+    expect(messages[0].message).to.match(new RegExp(englishJoinList(userList)));
   });
+  
+  
 });

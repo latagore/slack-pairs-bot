@@ -17,9 +17,9 @@ class BotintentTranslator {
     }
     if (unknownUsers.length) {
       if (unknownUsers.length === 1) {
-        this.client.messageChannel(`I don't know who ${englishJoinList(unknownUsers)} is, but I added them anyways. Say "${utils.BOT_NAME} remove ${englishJoinList(unknownUsers)}" to remove them.`, context.request.channelId, context.request.userHandle);
+        this.client.messageChannel(`I don't know who ${englishJoinList(unknownUsers)} is, but I added them anyways. Say "${utils.BOT_NAME} remove ${unknownUsers.join(" ")}" to remove them.`, context.request.channelId, context.request.userHandle);
       } else {
-        this.client.messageChannel(`I don't know who ${englishJoinList(unknownUsers)} are, but I added them anyways. Say "${utils.BOT_NAME} remove ${englishJoinList(unknownUsers)}" to remove them.`, context.request.channelId, context.request.userHandle);
+        this.client.messageChannel(`I don't know who ${englishJoinList(unknownUsers)} are, but I added them anyways. Say "${utils.BOT_NAME} remove ${unknownUsers.join(" ")}" to remove them.`, context.request.channelId, context.request.userHandle);
       }
     }
     if (existingUsers.length) {
