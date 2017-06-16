@@ -67,11 +67,11 @@ class BotintentTranslator {
   warnNotEnoughUsersToPair({entities, context}) {
     const {users} = entities;
     if (users.length === 0) {
-      this.client.messageChannel(`There are no users to pair. You can try something similar to "${utils.BOT_NAME} add users @joe @bob" to add some.`, context.request.userHandle);
+      this.client.messageChannel(`There are no users to pair. You can try something similar to "${utils.BOT_NAME} add users @joe @bob" to add some.`, context.request.channelId, context.request.userHandle);
     } else if (users.length === 1) {
-      this.client.messageChannel(`I can't pair only one person! You can try something similar to "${utils.BOT_NAME} add users @joe @bob" to add some.`, context.request.userHandle);
+      this.client.messageChannel(`I can't pair only one person! You can try something similar to "${utils.BOT_NAME} add users @joe @bob" to add some.`, context.request.channelId, context.request.userHandle);
     } else if (users.length === 2) {
-      this.client.messageChannel(`Here's your pair: ${users.join(" - ")}. You probably want to add more users though. You can try "${utils.BOT_NAME} add users @joe @bob".`, context.request.userHandle);
+      this.client.messageChannel(`Here's your pair: ${users.join(" - ")}. You probably want to add more users though. You can try "${utils.BOT_NAME} add users @joe @bob".`, context.request.channelId, context.request.userHandle);
     } else {
       console.error(new Error("we shouldn't be warning when there are more than 2 users!"));
       this.exceptionThrown(context);

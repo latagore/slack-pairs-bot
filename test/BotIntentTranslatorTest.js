@@ -162,7 +162,63 @@ describe('Bot intent translator', function () {
     expect(messages[0].message).to.match(new RegExp(englishJoinList(userList)));
   });
   
-  it('must list users', function () {
+  it('must warn when not enough users to pair', function () {
+    var messages = [];
+    var client = {
+      messageChannel: sinon.spy(function (message, channelId, userId) {
+        messages.push({message: message, channelId: channelId, userId: userId});
+      })
+    };
+    var context = {
+      request: {
+        userHandle: "testUser",
+        channelId: "someChannel"
+      }
+    };
+    var emptyUserList = [];
+    var singleUserList = ["@alice"];
+    var twoUserList = ["@joe", "@bob"];
+    var entities1 = {
+      users: emptyUserList
+    };
+    var entities2 = {
+      users: singleUserList
+    };
+    var entities3 = {
+      users: twoUserList
+    };
+    
+    var translator = new BotIntentTranslator(client);
+    
+    translator.warnNotEnoughUsersToPair({context: context, entities: entities1});
+    expect(client.messageChannel.calledOnce).to.be.true; 
+    expect(messages[0].channelId).to.equal(context.request.channelId);
+    expect(messages[0].userId).to.equal(context.request.userHandle);
+    // test that message contains user names
+    expect(messages[0].message).to.match(/There are no users to pair/);
+    messages = [];
+    client.messageChannel.reset();
+    
+    translator.warnNotEnoughUsersToPair({context: context, entities: entities2});
+    expect(client.messageChannel.calledOnce).to.be.true; 
+    expect(messages[0].channelId).to.equal(context.request.channelId);
+    expect(messages[0].userId).to.equal(context.request.userHandle);
+    // test that message indicates no users
+    expect(messages[0].message).to.match(/can't pair only one person/);
+    messages = [];
+    client.messageChannel.reset();
+    
+    translator.warnNotEnoughUsersToPair({context: context, entities: entities3});
+    expect(client.messageChannel.calledOnce).to.be.true; 
+    expect(messages[0].channelId).to.equal(context.request.channelId);
+    expect(messages[0].userId).to.equal(context.request.userHandle);
+    // test that message has only one user
+    expect(messages[0].message).to.match(/You probably want to add more users though/);
+    expect(messages[0].message).to.match(new RegExp(twoUserList.join(" - ")));
+    
+  });
+  
+    it('must list users', function () {
     var messages = [];
     var client = {
       messageChannel: sinon.spy(function (message, channelId, userId) {
