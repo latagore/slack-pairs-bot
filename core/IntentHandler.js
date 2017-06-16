@@ -81,11 +81,12 @@ class IntentHandler {
         resolve(action);
       } else if (intent === "pairUsersCommand") {
         let users = Array.from(this.list[context.channel]);
-        shuffle(users);
 
         if (users.length <= 3) {
-          action = {intent:"warnNotEnoughUsersToPair"};
+          action = {intent: "warnNotEnoughUsersToPair", entities: {users}};
         } else {
+          shuffle(users);
+          
           const groups = [];
           while (users.length > 3) {
             const pair = [];
