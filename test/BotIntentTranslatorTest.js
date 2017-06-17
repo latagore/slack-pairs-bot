@@ -218,7 +218,7 @@ describe('Bot intent translator', function () {
     
   });
   
-    it('must list users', function () {
+  it('must list users', function () {
     var messages = [];
     var client = {
       messageChannel: sinon.spy(function (message, channelId, userId) {
@@ -272,4 +272,60 @@ describe('Bot intent translator', function () {
     expect(messages[0].message).to.match(new RegExp(englishJoinList(singleUserList)));
     expect(messages[0].message).to.match(/only person in my list/);
   });
+  
+  it('must warn users when not enough people to pair', function () {
+    var messages = [];
+    var client = {
+      messageChannel: sinon.spy(function (message, channelId, userId) {
+        messages.push({message: message, channelId: channelId, userId: userId});
+      })
+    };
+    var context = {
+      request: {
+        userHandle: "testUser",
+        channelId: "someChannel"
+      }
+    };
+    var userList = ["@joe", "@bob"];
+    var emptyUserList = [];
+    var singleUserList = ["@alice"];
+    var entities1 = {
+      users: userList
+    };
+    var entities2 = {
+      users: emptyUserList
+    };
+    var entities3 = {
+      users: singleUserList
+    };
+    
+    var translator = new BotIntentTranslator(client);
+    
+    translator.informListStatus({context: context, entities: entities1});
+    expect(client.messageChannel.calledOnce).to.be.true; 
+    expect(messages[0].channelId).to.equal(context.request.channelId);
+    expect(messages[0].userId).to.equal(undefined);
+    // test that message contains user names
+    expect(messages[0].message).to.match(new RegExp(englishJoinList(userList)));
+    messages = [];
+    client.messageChannel.reset();
+    
+    translator.informListStatus({context: context, entities: entities2});
+    expect(client.messageChannel.calledOnce).to.be.true; 
+    expect(messages[0].channelId).to.equal(context.request.channelId);
+    expect(messages[0].userId).to.equal(undefined);
+    // test that message indicates no users
+    expect(messages[0].message).to.match(/I don't have any people in my list/);
+    messages = [];
+    client.messageChannel.reset();
+    
+    translator.informListStatus({context: context, entities: entities3});
+    expect(client.messageChannel.calledOnce).to.be.true; 
+    expect(messages[0].channelId).to.equal(context.request.channelId);
+    expect(messages[0].userId).to.equal(undefined);
+    // test that message has only one user
+    expect(messages[0].message).to.match(new RegExp(englishJoinList(singleUserList)));
+    expect(messages[0].message).to.match(/only person in my list/);
+  });
+  
 });
