@@ -328,4 +328,39 @@ describe('Bot intent translator', function () {
     expect(messages[0].message).to.match(/only person in my list/);
   });
   
+   it('must message about new grouped users', function () {
+    var messages = [];
+    var client = {
+      messageChannel: sinon.spy(function (message, channelId, userId) {
+        messages.push({message: message, channelId: channelId, userId: userId});
+      })
+    };
+    var context = {
+      request: {
+        userHandle: "testUser",
+        channelId: "someChannel"
+      }
+    };
+    var userList = ["@joe", "@bob"];
+    var emptyUserList = [];
+    var singleUserList = ["@alice"];
+    var entities = {
+      groups: [["@joe, @alice", "@paula"], ["@dave", "@fatima"], ["@adam", "evelyn", "@guy"]]
+    };
+     
+    var groupsString = entities.groups
+      .map(function(x) {return x.join(" - ");})
+      .join('\n');
+     
+    var translator = new BotIntentTranslator(client);
+    
+    translator.informPairStatus({context: context, entities: entities});
+    expect(client.messageChannel.calledOnce).to.be.true; 
+    expect(messages[0].channelId).to.equal(context.request.channelId);
+    expect(messages[0].userId).to.equal(undefined);
+    // test that message contains user names
+    expect(messages[0].message).to.match(/pairs/);
+    expect(messages[0].message).to.match(new RegExp(groupsString));
+  });
+  
 });

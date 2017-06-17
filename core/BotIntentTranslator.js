@@ -83,7 +83,7 @@ class BotintentTranslator {
     const groupsString = groups.map((g) => g.join(" - "))
       .join("\n");
     
-    this.client.messageChannel(`Here are your pairs: \n${groupsString}`);
+    this.client.messageChannel(`Here are your pairs: \n${groupsString}`, context.request.channelId);
   }
 }
 
