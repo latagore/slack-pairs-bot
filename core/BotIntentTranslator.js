@@ -72,9 +72,11 @@ class BotintentTranslator {
       this.client.messageChannel(`I can't pair only one person! You can try something similar to "${utils.BOT_NAME} add users @joe @bob" to add some.`, context.channel, context.user);
     } else if (users.length === 2) {
       this.client.messageChannel(`Here's your pair: ${users.join(" - ")}. You probably want to add more users though. You can try "${utils.BOT_NAME} add users @joe @bob".`, context.channel, context.user);
+    } else if (users.length === 3) {
+      this.client.messageChannel(`Here's your triplet: ${users.join(" - ")}. You probably want to add more users though. You can try "${utils.BOT_NAME} add users @joe @bob".`, context.channel, context.user);
     } else {
-      console.error(new Error("we shouldn't be warning when there are more than 2 users!"));
-      this.exceptionThrown(context);
+      console.error(new Error("we shouldn't be warning when there are 3 users or more!"));
+      this.exceptionThrown({context});
     }
   }
   
