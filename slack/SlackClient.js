@@ -40,8 +40,12 @@ class SlackClient {
   }
   
   messageChannel(message, channelId, recipientHandle) {
-    const fullMessage = `@${recipientHandle} ${message} `;
-    this.rtm.sendMessage(fullMessage, channelId);
+    if (recipientHandle) {
+      const fullMessage = `<@${recipientHandle}> ${message} `;
+      this.rtm.sendMessage(fullMessage, channelId);
+    } else {
+      this.rtm.sendMessage(message, channelId);
+    }
   }
   
   getUsers() {
