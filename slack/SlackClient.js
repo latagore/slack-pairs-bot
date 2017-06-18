@@ -6,30 +6,34 @@ const IntentHandler = require('../core/IntentHandler.js');
 const BotIntentTranslator = require('../core/BotIntentTranslator.js');
 
 class SlackClient {
-  constructor(rtc, web) {
-    this.rtc = promisifyAll(rtc);
-    this.web = promisifyAll(web);
+  constructor(rtm, web, rtmStartData) {
+    this.rtm = promisifyAll(rtm);
+    this.web = web;
+    this.web.users = promisifyAll(this.web.users);
+    this.rtmStartData = rtmStartData;
     
-    this.interpret = IntentInterpreter;
+    this.intentInterpreter = new IntentInterpreter(this.rtmStartData.self.id);
     this.intentHandler = new IntentHandler(this);
     this.botIntentTranslator = new BotIntentTranslator(this);
-    
-    this.rtm.start();
 
-    this.rtm.on(RTM_EVENTS.MESSAGE, function handleRtmMessage(message) {
-      var {intent, entities, isForBot} = this.interpret(message);
+    this.rtm.on(RTM_EVENTS.MESSAGE, (message) => {
+      var {intent, entities, isForBot} = this.intentInterpreter.interpret(message.text);
+      console.log({intent, entities, isForBot});
       if (isForBot) {
         var context = message;
-        this.intentHandler.handleIntent({intent, entities}, message)
+        console.log(message);
+        this.intentHandler.handleIntent(intent, entities, context)
         .then((action) => {
           if (action) {
             // execute the action by looking up the action as a property of the botIntentTranslator
-            this.botIntentTranslator[action]();
+            console.log(action);
+            this.botIntentTranslator[action.intent]({entities: action.entities, context});
           } else {
             console.warn("shouldn't we have an action for this?");
           }
-        }).catch(() => {
-          console.error(new Error("something went wrong"));
+        }).catch((e) => {
+          console.error("something went wrong:", e);
+          this.botIntentTranslator.exceptionThrown(context);
         });
       }
     });
