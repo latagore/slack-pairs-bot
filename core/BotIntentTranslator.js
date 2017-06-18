@@ -1,6 +1,16 @@
 const utils = require('./utils.js');
 const englishJoinList = utils.englishJoinList;
 
+const commands = [
+  { name: 'Pair', description: 'Pairs people in my list.', usage: `${utils.BOT_NAME} pair`},
+  { name: 'Add', description: 'Adds people to my list.', usage: `${utils.BOT_NAME} add users @joe @bob`},
+  { name: 'Remove', description: 'Removes people from my list.', usage: `${utils.BOT_NAME} remove users @joe @bob`},
+  { name: 'Show list', description: 'Shows the people in my list in this channel.', usage: `${utils.BOT_NAME} list users`},
+];
+const formattedCommands = commands.map(c => {
+  return `${c.name}: \`${c.usage}\` _${c.description}_`;
+}).join("\n");
+
 class BotintentTranslator {
   constructor(client) {
     this.client = client;
@@ -86,6 +96,10 @@ class BotintentTranslator {
       .join("\n");
     
     this.client.messageChannel(`Here are your pairs: \n${groupsString}`, context.channel);
+  }
+  
+  introduce({context}) {
+    this.client.messageChannel(`Hi, I'm ${utils.BOT_NAME}, a bot.\nI keep a list of people and can group them up into pairs, usually for pair programming. If there's an odd number of people, one group will have three people. Here's the things you can tell me to do:\n${formattedCommands}`, context.channel, context.user);
   }
 }
 

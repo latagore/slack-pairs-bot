@@ -103,8 +103,17 @@ class IntentHandler {
           action = {intent: "informPairStatus", entities: {groups}};
         }
         resolve(action);
+      } else if (intent === "greeting") {
+        action = { intent: "introduce" };
+        resolve(action);
+      } else if (intent === "help") {
+        action = { intent: "introduce" };
+        resolve(action);
+      } else if (intent === "invite") {
+        action = { intent: "introduce" };
+        resolve(action);
       } else {
-        resolve();
+        reject(new Error(`don't know how to deal with "${intent}" intent`));
       }
     });
     

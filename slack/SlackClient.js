@@ -17,11 +17,10 @@ class SlackClient {
     this.botIntentTranslator = new BotIntentTranslator(this);
 
     this.rtm.on(RTM_EVENTS.MESSAGE, (message) => {
-      var {intent, entities, isForBot} = this.intentInterpreter.interpret(message.text);
-      console.log({intent, entities, isForBot});
+      var {intent, entities, isForBot} = this.intentInterpreter.interpret(message);
+      console.log(message);
       if (isForBot) {
         var context = message;
-        console.log(message);
         this.intentHandler.handleIntent(intent, entities, context)
         .then((action) => {
           if (action) {
@@ -51,6 +50,7 @@ class SlackClient {
   getUsers() {
     return this.web.users.listAsync(false);
   }
+  
 }
 
 module.exports = SlackClient;
