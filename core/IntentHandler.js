@@ -120,17 +120,18 @@ class IntentHandler {
 
       // create lookup map for all users by their id
       let userMap = {};
-      response.members.forEach(user => {userMap[user.name] = user;});
+      response.members.forEach(user => { userMap[user.id] = user; });
 
       // look up each user id that the messager asked to add
       // will be undefined if that user id doesn't exist
+      // FIXME need to remove slack specific logic
       let usersToAdd = usersIdToAdd.map(text => {
-        if (text.startsWith("@")) {
-          text = text.slice(1); // remove @ prefix
-          const result = { user: userMap[text], text };
-          return result;
+        const matches = text.match(/<@(.+)>/);
+        let userId;
+        if (matches) {
+          userId = matches[1]; // remove <@ ... > wrapper
         }
-        return {text}; // FIXME need to revisit this...
+        return { user: userMap[userId], text };
       });
 
       // add users to our list. keep track of unknown users
@@ -139,17 +140,13 @@ class IntentHandler {
       let existingUsers = [];
       usersToAdd.forEach(result => {
         let id;
-        // FIXME change to nested ifs
-        if (result.user && list.has("@" + result.user.name)) {
-          existingUsers.push("@" + result.user.name);
-        } else if (list.has(result.text)) {
+        if (list.has(result.text)) {
           existingUsers.push(result.text);
         } else if (result.user) {
-          id = "@" + result.user.name;
-          knownUsers.push(id);
+          knownUsers.push(result.text);
         } else {
           id = result.text;
-          unknownUsers.push(id);
+          unknownUsers.push(result.text);
         }
       });
       
