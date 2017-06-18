@@ -32,7 +32,7 @@ class BotintentTranslator {
   }
   
   exceptionThrown({context}) {
-    this.client.messageChannel("Something went wrong with your last request. Try again later or ask someone to fix me.", context.user);
+    this.client.messageChannel("Something went wrong with your last request. Try again later or ask someone to fix me.", context.channel, context.user);
   }
   
   warnNoUsersToRemove({context}) {
