@@ -42,7 +42,7 @@ class BotintentTranslator {
   informRemoveStatus({entities, context}) {
     const {removedUsers, unknownUsers} = entities;
     if (removedUsers.length) {
-      this.client.messageChannel(`I removedUsers ${englishJoinList(removedUsers)}!`, context.channel);
+      this.client.messageChannel(`I removed ${englishJoinList(removedUsers)}!`, context.channel);
     }
     if (unknownUsers.length) {
       if (unknownUsers.length === 1) {
