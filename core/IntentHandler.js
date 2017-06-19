@@ -111,6 +111,8 @@ class IntentHandler {
         resolve(action);
       } else if (intent === "invite") {
         action = { intent: "introduce" };
+      } else if (intent === "unknown") {
+        action = { intent: "informUnknown" };
         resolve(action);
       } else {
         reject(new Error(`don't know how to deal with "${intent}" intent`));

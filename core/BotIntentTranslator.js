@@ -101,6 +101,10 @@ class BotintentTranslator {
   introduce({context}) {
     this.client.messageChannel(`Hi, I'm ${utils.BOT_NAME}, a bot.\nI keep a list of people and can group them up into pairs, usually for pair programming. If there's an odd number of people, one group will have three people. Here's the things you can tell me to do:\n${formattedCommands}`, context.channel, context.user);
   }
+  
+  informUnknown({context}) {
+    this.client.messageChannel(`Sorry, I didn't understand that. To find out what I can understand, say "${utils.BOT_NAME} help".`, context.channel, context.user);
+  }
 }
 
 module.exports = BotintentTranslator;
