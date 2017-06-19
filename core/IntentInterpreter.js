@@ -15,7 +15,7 @@ class IntentInterpreter {
         message.user === this.selfId) {
       intent = 'invite';
       entities = {};
-    } else if (message.type === 'message') {
+    } else if (message.type === 'message' && !message.subtype) {
       let messageText = message.text.trim();
       if (startsWith(messageText, this.selfIdText)) {
         messageText = messageText.replace(new RegExp(this.selfIdText + "\\s+"), '');
