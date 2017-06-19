@@ -47,9 +47,10 @@ class IntentInterpreter {
         intent = "unknown";
         entities = {};
       }
+      return {intent, entities, isForBot: true};
     }
     // returns {intent, entities}
-    return {intent, entities, isForBot: true};
+    return { isForBot: false };
   }
 }
 module.exports = IntentInterpreter;

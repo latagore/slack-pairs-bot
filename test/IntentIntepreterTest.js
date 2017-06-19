@@ -1,24 +1,31 @@
 /* jshint expr:true */
 /* allow expr because of chai.expect */
-var intentIntepreter = require('../core/IntentInterpreter.js');
-var utils = require('../core/utils.js');
+var IntentInterpreter = require('../core/IntentInterpreter.js');
 var expect = require('chai').expect;
 var sinon = require('sinon');
+
+var BOT_NAME = "pairsbot";
+var WRAPPED_BOT_NAME = "<@" + BOT_NAME + ">";
+var ii = new IntentInterpreter(BOT_NAME);
 
 describe('intent intepreters', function () {
   it('must translate messages intending to add users', function () {
     var messages = [
-      utils.BOT_NAME + " add users @joe @amy",
-      utils.BOT_NAME + " add user @joe @amy",
-      utils.BOT_NAME + " add people @joe @amy",
-      utils.BOT_NAME + " add @joe @amy",
+      WRAPPED_BOT_NAME + " add users @joe @amy",
+      WRAPPED_BOT_NAME + " add user @joe @amy",
+      WRAPPED_BOT_NAME + " add people @joe @amy",
+      WRAPPED_BOT_NAME + " add @joe @amy",
       
-      "  " + utils.BOT_NAME + "      add    users @joe   @amy    ",
-      "  " + utils.BOT_NAME + "      add @joe   @amy    ",
-      "  " + utils.BOT_NAME + "      add @joe   amy  @bob @alice fatima lee  "
+      "  " + WRAPPED_BOT_NAME + "      add    users @joe   @amy    ",
+      "  " + WRAPPED_BOT_NAME + "      add @joe   @amy    ",
+      "  " + WRAPPED_BOT_NAME + "      add @joe   amy  @bob @alice fatima lee  "
     ];
+    // change into object with text property
+    messages = messages.map(function (m) {
+      return { text: m, type: 'message' };
+    });
     
-    var results = messages.map(intentIntepreter);
+    var results = messages.map(function (m) { return ii.interpret(m); });
     var expected = [
       { intent: "addUserCommand", entities: {users: ["@joe", "@amy"]}, isForBot: true },
       { intent: "addUserCommand", entities: {users: ["@joe", "@amy"]}, isForBot: true },
@@ -45,17 +52,21 @@ describe('intent intepreters', function () {
   
   it('must translate messages intending to remove users', function () {
     var messages = [
-      utils.BOT_NAME + " remove users @joe @amy",
-      utils.BOT_NAME + " remove user @joe @amy",
-      utils.BOT_NAME + " remove people @joe @amy",
-      utils.BOT_NAME + " remove @joe @amy",
+      WRAPPED_BOT_NAME + " remove users @joe @amy",
+      WRAPPED_BOT_NAME + " remove user @joe @amy",
+      WRAPPED_BOT_NAME + " remove people @joe @amy",
+      WRAPPED_BOT_NAME + " remove @joe @amy",
       
-      "  " + utils.BOT_NAME + "      remove    users @joe   @amy    ",
-      "  " + utils.BOT_NAME + "      remove @joe   @amy    ",
-      "  " + utils.BOT_NAME + "      remove @joe   amy  @bob @alice fatima lee  "
+      "  " + WRAPPED_BOT_NAME + "      remove    users @joe   @amy    ",
+      "  " + WRAPPED_BOT_NAME + "      remove @joe   @amy    ",
+      "  " + WRAPPED_BOT_NAME + "      remove @joe   amy  @bob @alice fatima lee  "
     ];
+    // change into object with text property
+    messages = messages.map(function (m) {
+      return { text: m, type: 'message' };
+    });
     
-    var results = messages.map(intentIntepreter);
+    var results = messages.map(function (m) { return ii.interpret(m); });
     var expected = [
       { intent: "removeUserCommand", entities: {users: ["@joe", "@amy"]}, isForBot: true },
       { intent: "removeUserCommand", entities: {users: ["@joe", "@amy"]}, isForBot: true },
@@ -82,14 +93,18 @@ describe('intent intepreters', function () {
   
   it('must translate messages intending to list users', function () {
     var messages = [
-      utils.BOT_NAME + " list users",
-      utils.BOT_NAME + " list",
+      WRAPPED_BOT_NAME + " list users",
+      WRAPPED_BOT_NAME + " list",
       
-      "   " + utils.BOT_NAME + "      list   users ",
-      "   " + utils.BOT_NAME + "      list   ",
+      "   " + WRAPPED_BOT_NAME + "      list   users ",
+      "   " + WRAPPED_BOT_NAME + "      list   ",
     ];
+    // change into object with text property
+    messages = messages.map(function (m) {
+      return { text: m, type: 'message' };
+    });
     
-    var results = messages.map(intentIntepreter);
+    var results = messages.map(function (m) { return ii.interpret(m); });
     var expected = [
       { intent: "listUsersCommand", entities: {}, isForBot: true },
       { intent: "listUsersCommand", entities: {}, isForBot: true },
@@ -110,14 +125,18 @@ describe('intent intepreters', function () {
   
   it('must translate messages intending to pair users', function () {
     var messages = [
-      utils.BOT_NAME + " pair users",
-      utils.BOT_NAME + " pair",
-      utils.BOT_NAME + " pairs",
-      "   " + utils.BOT_NAME + "   pairs      ",
-      "   " + utils.BOT_NAME + " pairs    users  "
+      WRAPPED_BOT_NAME + " pair users",
+      WRAPPED_BOT_NAME + " pair",
+      WRAPPED_BOT_NAME + " pairs",
+      "   " + WRAPPED_BOT_NAME + "   pairs      ",
+      "   " + WRAPPED_BOT_NAME + " pairs    users  "
     ];
+    // change into object with text property
+    messages = messages.map(function (m) {
+      return { text: m, type: 'message' };
+    });
     
-    var results = messages.map(intentIntepreter);
+    var results = messages.map(function (m) { return ii.interpret(m); });
     var expected = [
       { intent: "pairUsersCommand", entities: {}, isForBot: true },
       { intent: "pairUsersCommand", entities: {}, isForBot: true },
