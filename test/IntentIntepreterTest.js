@@ -153,4 +153,8 @@ describe('intent intepreters', function () {
     expect(results[3]).to.be.deep.equal(expected[3]);
     expect(results[4]).to.be.deep.equal(expected[4]);
   });
+  
+  it('must interpret intent of invite messages');
+  
+  it('must interpret intent of messages not to itself');
 });
