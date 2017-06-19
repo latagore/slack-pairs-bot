@@ -11,22 +11,20 @@ describe('Bot intent translator', function () {
   it('must warn no users to add', function () {
     var messages = [];
     var client = {
-      messageChannel: sinon.spy(function (message, channelId, userId) {
-        messages.push({message: message, channelId: channelId, userId: userId});
+      messageChannel: sinon.spy(function (message, channel, userId) {
+        messages.push({message: message, channel: channel, userId: userId});
       })
     };
     var context = {
-      request: {
-        userHandle: "testUser",
-        channelId: "someChannel"
-      }
+      user: "testUser",
+      channel: "someChannel"
     };
     var translator = new BotIntentTranslator(client);
     translator.warnNoUsersToAdd({context: context});
     expect(client.messageChannel.calledOnce).to.be.true;
     
-    expect(messages[0].channelId).to.equal(context.request.channelId);
-    expect(messages[0].userId).to.equal(context.request.userHandle);
+    expect(messages[0].channel).to.equal(context.channel);
+    expect(messages[0].userId).to.equal(context.user);
     // test that message indicates no names in message
     expect(messages[0].message).to.match(/I didn't see any names to add/);
   });
@@ -34,15 +32,13 @@ describe('Bot intent translator', function () {
   it('must explain added users status', function () {
     var messages = [];
     var client = {
-      messageChannel: sinon.spy(function (message, channelId, userId) {
-        messages.push({message: message, channelId: channelId, userId: userId});
+      messageChannel: sinon.spy(function (message, channel, userId) {
+        messages.push({message: message, channel: channel, userId: userId});
       })
     };
     var context = {
-      request: {
-        userHandle: "testUser",
-        channelId: "someChannel"
-      }
+      user: "testUser",
+      channel: "someChannel"
     };
     var userList = ["@joe", "@bob"];
     var entities1 = {
@@ -66,7 +62,7 @@ describe('Bot intent translator', function () {
     translator.informAddStatus({entities: entities1, context: context});
     
     expect(client.messageChannel.calledOnce).to.be.true;
-    expect(messages[0].channelId).to.equal(context.request.channelId);
+    expect(messages[0].channel).to.equal(context.channel);
     // don't need user handle for informational messages
     expect(messages[0].userId).to.equal(undefined);
     // test that message indicates users to add
@@ -77,8 +73,8 @@ describe('Bot intent translator', function () {
     
     translator.informAddStatus({entities: entities2, context: context});
     expect(client.messageChannel.calledOnce).to.be.true;
-    expect(messages[0].channelId).to.equal(context.request.channelId);
-    expect(messages[0].userId).to.equal(context.request.userHandle);
+    expect(messages[0].channel).to.equal(context.channel);
+    expect(messages[0].userId).to.equal(context.user);
     // test that message indicates no names in message
     expect(messages[0].message).to.match(/already in my list/);
     expect(messages[0].message).to.match(new RegExp(englishJoinList(userList)));
@@ -87,8 +83,8 @@ describe('Bot intent translator', function () {
     
     translator.informAddStatus({entities: entities3, context: context});
     expect(client.messageChannel.calledOnce).to.be.true;
-    expect(messages[0].channelId).to.equal(context.request.channelId);
-    expect(messages[0].userId).to.equal(context.request.userHandle);
+    expect(messages[0].channel).to.equal(context.channel);
+    expect(messages[0].userId).to.equal(context.user);
     // test that message indicates it doesn't know added users
     expect(messages[0].message).to.match(/I don't know who/);
     expect(messages[0].message).to.match(new RegExp(englishJoinList(userList)));
@@ -97,22 +93,20 @@ describe('Bot intent translator', function () {
   it('must warn no users to remove', function () {
     var messages = [];
     var client = {
-      messageChannel: sinon.spy(function (message, channelId, userId) {
-        messages.push({message: message, channelId: channelId, userId: userId});
+      messageChannel: sinon.spy(function (message, channel, userId) {
+        messages.push({message: message, channel: channel, userId: userId});
       })
     };
     var context = {
-      request: {
-        userHandle: "testUser",
-        channelId: "someChannel"
-      }
+      user: "testUser",
+      channel: "someChannel"
     };
     var translator = new BotIntentTranslator(client);
     translator.warnNoUsersToRemove({context: context});
     expect(client.messageChannel.calledOnce).to.be.true;
     
-    expect(messages[0].channelId).to.equal(context.request.channelId);
-    expect(messages[0].userId).to.equal(context.request.userHandle);
+    expect(messages[0].channel).to.equal(context.channel);
+    expect(messages[0].userId).to.equal(context.user);
     // test that message indicates no names in message
     expect(messages[0].message).to.match(/I didn't see any names to remove/);
   });
@@ -120,15 +114,13 @@ describe('Bot intent translator', function () {
   it('must explain removed users status', function () {
     var messages = [];
     var client = {
-      messageChannel: sinon.spy(function (message, channelId, userId) {
-        messages.push({message: message, channelId: channelId, userId: userId});
+      messageChannel: sinon.spy(function (message, channel, userId) {
+        messages.push({message: message, channel: channel, userId: userId});
       })
     };
     var context = {
-      request: {
-        userHandle: "testUser",
-        channelId: "someChannel"
-      }
+      user: "testUser",
+      channel: "someChannel"
     };
     var userList = ["@joe", "@bob"];
     var entities1 = {
@@ -144,7 +136,7 @@ describe('Bot intent translator', function () {
     
     translator.informRemoveStatus({entities: entities1, context: context});   
     expect(client.messageChannel.calledOnce).to.be.true;
-    expect(messages[0].channelId).to.equal(context.request.channelId);
+    expect(messages[0].channel).to.equal(context.channel);
     // don't need user handle for informational messages
     expect(messages[0].userId).to.equal(undefined);
     // test that message indicates users to add
@@ -155,8 +147,8 @@ describe('Bot intent translator', function () {
     
     translator.informRemoveStatus({entities: entities2, context: context});
     expect(client.messageChannel.calledOnce).to.be.true;
-    expect(messages[0].channelId).to.equal(context.request.channelId);
-    expect(messages[0].userId).to.equal(context.request.userHandle);
+    expect(messages[0].channel).to.equal(context.channel);
+    expect(messages[0].userId).to.equal(context.user);
     // test that message indicates no names in message
     expect(messages[0].message).to.match(/isn't in my list/);
     expect(messages[0].message).to.match(new RegExp(englishJoinList(userList)));
@@ -165,15 +157,13 @@ describe('Bot intent translator', function () {
   it('must warn when not enough users to pair', function () {
     var messages = [];
     var client = {
-      messageChannel: sinon.spy(function (message, channelId, userId) {
-        messages.push({message: message, channelId: channelId, userId: userId});
+      messageChannel: sinon.spy(function (message, channel, userId) {
+        messages.push({message: message, channel: channel, userId: userId});
       })
     };
     var context = {
-      request: {
-        userHandle: "testUser",
-        channelId: "someChannel"
-      }
+      user: "testUser",
+      channel: "someChannel"
     };
     var emptyUserList = [];
     var singleUserList = ["@alice"];
@@ -192,8 +182,8 @@ describe('Bot intent translator', function () {
     
     translator.warnNotEnoughUsersToPair({context: context, entities: entities1});
     expect(client.messageChannel.calledOnce).to.be.true; 
-    expect(messages[0].channelId).to.equal(context.request.channelId);
-    expect(messages[0].userId).to.equal(context.request.userHandle);
+    expect(messages[0].channel).to.equal(context.channel);
+    expect(messages[0].userId).to.equal(context.user);
     // test that message contains user names
     expect(messages[0].message).to.match(/There are no users to pair/);
     messages = [];
@@ -201,8 +191,8 @@ describe('Bot intent translator', function () {
     
     translator.warnNotEnoughUsersToPair({context: context, entities: entities2});
     expect(client.messageChannel.calledOnce).to.be.true; 
-    expect(messages[0].channelId).to.equal(context.request.channelId);
-    expect(messages[0].userId).to.equal(context.request.userHandle);
+    expect(messages[0].channel).to.equal(context.channel);
+    expect(messages[0].userId).to.equal(context.user);
     // test that message indicates no users
     expect(messages[0].message).to.match(/can't pair only one person/);
     messages = [];
@@ -210,8 +200,8 @@ describe('Bot intent translator', function () {
     
     translator.warnNotEnoughUsersToPair({context: context, entities: entities3});
     expect(client.messageChannel.calledOnce).to.be.true; 
-    expect(messages[0].channelId).to.equal(context.request.channelId);
-    expect(messages[0].userId).to.equal(context.request.userHandle);
+    expect(messages[0].channel).to.equal(context.channel);
+    expect(messages[0].userId).to.equal(context.user);
     // test that message has only one user
     expect(messages[0].message).to.match(/You probably want to add more users though/);
     expect(messages[0].message).to.match(new RegExp(twoUserList.join(" - ")));
@@ -221,15 +211,13 @@ describe('Bot intent translator', function () {
   it('must list users', function () {
     var messages = [];
     var client = {
-      messageChannel: sinon.spy(function (message, channelId, userId) {
-        messages.push({message: message, channelId: channelId, userId: userId});
+      messageChannel: sinon.spy(function (message, channel, userId) {
+        messages.push({message: message, channel: channel, userId: userId});
       })
     };
     var context = {
-      request: {
-        userHandle: "testUser",
-        channelId: "someChannel"
-      }
+      user: "testUser",
+      channel: "someChannel"
     };
     var userList = ["@joe", "@bob"];
     var emptyUserList = [];
@@ -248,7 +236,7 @@ describe('Bot intent translator', function () {
     
     translator.informListStatus({context: context, entities: entities1});
     expect(client.messageChannel.calledOnce).to.be.true; 
-    expect(messages[0].channelId).to.equal(context.request.channelId);
+    expect(messages[0].channel).to.equal(context.channel);
     expect(messages[0].userId).to.equal(undefined);
     // test that message contains user names
     expect(messages[0].message).to.match(new RegExp(englishJoinList(userList)));
@@ -257,7 +245,7 @@ describe('Bot intent translator', function () {
     
     translator.informListStatus({context: context, entities: entities2});
     expect(client.messageChannel.calledOnce).to.be.true; 
-    expect(messages[0].channelId).to.equal(context.request.channelId);
+    expect(messages[0].channel).to.equal(context.channel);
     expect(messages[0].userId).to.equal(undefined);
     // test that message indicates no users
     expect(messages[0].message).to.match(/I don't have any people in my list/);
@@ -266,7 +254,7 @@ describe('Bot intent translator', function () {
     
     translator.informListStatus({context: context, entities: entities3});
     expect(client.messageChannel.calledOnce).to.be.true; 
-    expect(messages[0].channelId).to.equal(context.request.channelId);
+    expect(messages[0].channel).to.equal(context.channel);
     expect(messages[0].userId).to.equal(undefined);
     // test that message has only one user
     expect(messages[0].message).to.match(new RegExp(englishJoinList(singleUserList)));
@@ -276,15 +264,13 @@ describe('Bot intent translator', function () {
   it('must warn users when not enough people to pair', function () {
     var messages = [];
     var client = {
-      messageChannel: sinon.spy(function (message, channelId, userId) {
-        messages.push({message: message, channelId: channelId, userId: userId});
+      messageChannel: sinon.spy(function (message, channel, userId) {
+        messages.push({message: message, channel: channel, userId: userId});
       })
     };
     var context = {
-      request: {
-        userHandle: "testUser",
-        channelId: "someChannel"
-      }
+      user: "testUser",
+      channel: "someChannel"
     };
     var userList = ["@joe", "@bob"];
     var emptyUserList = [];
@@ -303,7 +289,7 @@ describe('Bot intent translator', function () {
     
     translator.informListStatus({context: context, entities: entities1});
     expect(client.messageChannel.calledOnce).to.be.true; 
-    expect(messages[0].channelId).to.equal(context.request.channelId);
+    expect(messages[0].channel).to.equal(context.channel);
     expect(messages[0].userId).to.equal(undefined);
     // test that message contains user names
     expect(messages[0].message).to.match(new RegExp(englishJoinList(userList)));
@@ -312,7 +298,7 @@ describe('Bot intent translator', function () {
     
     translator.informListStatus({context: context, entities: entities2});
     expect(client.messageChannel.calledOnce).to.be.true; 
-    expect(messages[0].channelId).to.equal(context.request.channelId);
+    expect(messages[0].channel).to.equal(context.channel);
     expect(messages[0].userId).to.equal(undefined);
     // test that message indicates no users
     expect(messages[0].message).to.match(/I don't have any people in my list/);
@@ -321,7 +307,7 @@ describe('Bot intent translator', function () {
     
     translator.informListStatus({context: context, entities: entities3});
     expect(client.messageChannel.calledOnce).to.be.true; 
-    expect(messages[0].channelId).to.equal(context.request.channelId);
+    expect(messages[0].channel).to.equal(context.channel);
     expect(messages[0].userId).to.equal(undefined);
     // test that message has only one user
     expect(messages[0].message).to.match(new RegExp(englishJoinList(singleUserList)));
@@ -331,15 +317,13 @@ describe('Bot intent translator', function () {
    it('must message about new grouped users', function () {
     var messages = [];
     var client = {
-      messageChannel: sinon.spy(function (message, channelId, userId) {
-        messages.push({message: message, channelId: channelId, userId: userId});
+      messageChannel: sinon.spy(function (message, channel, userId) {
+        messages.push({message: message, channel: channel, userId: userId});
       })
     };
     var context = {
-      request: {
-        userHandle: "testUser",
-        channelId: "someChannel"
-      }
+      user: "testUser",
+      channel: "someChannel"
     };
     var userList = ["@joe", "@bob"];
     var emptyUserList = [];
@@ -356,7 +340,7 @@ describe('Bot intent translator', function () {
     
     translator.informPairStatus({context: context, entities: entities});
     expect(client.messageChannel.calledOnce).to.be.true; 
-    expect(messages[0].channelId).to.equal(context.request.channelId);
+    expect(messages[0].channel).to.equal(context.channel);
     expect(messages[0].userId).to.equal(undefined);
     // test that message contains user names
     expect(messages[0].message).to.match(/pairs/);
