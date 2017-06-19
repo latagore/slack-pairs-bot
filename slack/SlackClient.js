@@ -12,9 +12,10 @@ class SlackClient {
     this.web.users = promisifyAll(this.web.users);
     this.rtmStartData = rtmStartData;
     
-    this.intentInterpreter = new IntentInterpreter(this.rtmStartData.self.id);
+    const botName = this.rtmStartData.self.id;
+    this.intentInterpreter = new IntentInterpreter(botName);
     this.intentHandler = new IntentHandler(this);
-    this.botIntentTranslator = new BotIntentTranslator(this);
+    this.botIntentTranslator = new BotIntentTranslator(this, botName);
 
     this.rtm.on(RTM_EVENTS.MESSAGE, (message) => {
       var {intent, entities, isForBot} = this.intentInterpreter.interpret(message);

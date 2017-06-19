@@ -17,7 +17,6 @@ let botUser;
 
 rtm.on(CLIENT_EVENTS.RTM.AUTHENTICATED, function (rtmStartData) {
   console.log(`Bot started. Logged in as ${rtmStartData.self.name} of team ${rtmStartData.team.name}.`);
-  console.log(rtmStartData);
   const slackClient = new SlackClient(rtm, web, rtmStartData);
   botUser = rtmStartData.self;
 });

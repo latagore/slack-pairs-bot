@@ -1,6 +1,4 @@
-module.exports = {
-  BOT_NAME: "@pairsbot",
-  
+module.exports = {  
   englishJoinList(arr) {
     if (arr.length === 0) {
       return '';
