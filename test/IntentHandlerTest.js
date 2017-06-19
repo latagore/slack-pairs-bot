@@ -11,15 +11,15 @@ describe('intent handlers', function() {
         sinon.stub().returns(Promise.resolve({
           ok: true,
           members: [
-            { name: "joe" },
-            { name: "bob" },
-            { name: "alice" },
+            { name: "joe", id: "uid1" },
+            { name: "bob", id: "uid2" },
+            { name: "alice", id: "uid3" },
           ]
         }))
     };
     
-    var addUsersList1 = ["@joe", "@bob"];
-    var addUsersList2 = ["@alice"];
+    var addUsersList1 = ["<@uid1>", "<@uid2>"];
+    var addUsersList2 = ["<@uid3>"];
     var expectedAction1 = {
       intent: "informAddStatus",
       entities: {
@@ -68,14 +68,14 @@ describe('intent handlers', function() {
         sinon.stub().returns(Promise.resolve({
           ok: true,
           members: [
-            { name: "joe" },
-            { name: "bob" },
-            { name: "alice" },
+            { name: "joe", id: "uid1" },
+            { name: "bob", id: "uid2" },
+            { name: "alice", id: "uid3" },
           ]
         }))
     };
     
-    var addUsersList = ["@joe", "@joe"];
+    var addUsersList = ["<@uid1>", "<@uid2>"];
     var uniqueList = Array.from(new Set(addUsersList));
     var expectedAction1 = {
       intent: "informAddStatus",
@@ -126,14 +126,14 @@ describe('intent handlers', function() {
         sinon.stub().returns(Promise.resolve({
           ok: true,
           members: [
-            { name: "joe" },
-            { name: "bob" },
-            { name: "alice" },
+            { name: "joe", id: "uid1" },
+            { name: "bob", id: "uid2" },
+            { name: "alice", id: "uid3" },
           ]
         }))
     };
     
-    var addUsersList = ["@joe"];
+    var addUsersList = ["<@uid1>"];
     var emptyUsersList = [];
     var expectedAction1 = {
       intent: "warnNoUsersToAdd"
@@ -190,8 +190,8 @@ describe('intent handlers', function() {
   it('must remove users', function() {
     var client = {};
     
-    var removeUsersList1 = ["@joe", "@bob"];
-    var removeUsersList2 = ["@alice"];
+    var removeUsersList1 = ["<@uid1>", "<@uid2>"];
+    var removeUsersList2 = ["<@uid3>"];
     
     var expectedAction1 = {
       intent: "informRemoveStatus",
@@ -210,7 +210,7 @@ describe('intent handlers', function() {
     
     var channel = "someChannel";
     var ih = new IntentHandler(client);
-    ih.list[channel] = new Set(["@joe", "@bob", "@alice"]);
+    ih.list[channel] = new Set(["<@uid1>", "<@uid2>", "<@uid3>"]);
     
       
     return ih.handleIntent(
@@ -235,7 +235,7 @@ describe('intent handlers', function() {
   it('must list users', function () {
     var client = {};
     
-    var users = ["@joe", "@bob", "@alice"];
+    var users = ["<@uid1>", "<@uid2>", "<@uid3>"];
     var expectedAction = {
       intent: "informListStatus",
       entities: {
@@ -258,7 +258,7 @@ describe('intent handlers', function() {
   it('must pair users', function () {
     var client = {};
     
-    var users = ["@joe", "@bob", "@alice", "@karen", "@ali", "@fatima", "@lee"];
+    var users = ["<@uid1>", "<@uid2>", "<@uid3>", "<@uid4>", "<@uid5>", "<@uid6>", "<@uid7>"];
     var channel = 'someChannel';
     var ih = new IntentHandler(client);
     ih.list[channel] = new Set(users);
@@ -284,15 +284,15 @@ describe('intent handlers', function() {
         sinon.stub().returns(Promise.resolve({
           ok: true,
           members: [
-            { name: "joe" },
-            { name: "bob" },
-            { name: "alice" }
+            { name: "joe", id: "uid1" },
+            { name: "bob", id: "uid2" },
+            { name: "alice", id: "uid3" }
           ]
         }))
     };
     
-    var addUsersList1 = ["@joe", "@bob"];
-    var addUsersList2 = ["alice", "@alice"];
+    var addUsersList1 = ["<@uid1>", "<@uid2>"];
+    var addUsersList2 = ["@uid3", "<@uid3>"];
     var expectedAction1 = {
       intent: "informAddStatus",
       entities: {
@@ -304,9 +304,9 @@ describe('intent handlers', function() {
     var expectedAction2 = {
       intent: "informAddStatus",
       entities: {
-        unknownUsers: ["alice"],
+        unknownUsers: ["@uid3"],
         existingUsers: [],
-        knownUsers: ["@alice"]
+        knownUsers: ["<@uid3>"]
       }
     };    
     var channel = "someChannel";
