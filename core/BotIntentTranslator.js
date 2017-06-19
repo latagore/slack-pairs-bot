@@ -2,10 +2,10 @@ const utils = require('./utils.js');
 const englishJoinList = utils.englishJoinList;
 
 const commands = [
-  { name: 'Pair', description: 'Pairs people in my list.', usage: `${this.botName} pair`},
-  { name: 'Add', description: 'Adds people to my list.', usage: `${this.botName} add users @joe @bob`},
-  { name: 'Remove', description: 'Removes people from my list.', usage: `${this.botName} remove users @joe @bob`},
-  { name: 'Show list', description: 'Shows the people in my list in this channel.', usage: `${this.botName} list users`},
+  { name: 'Pair', description: 'Pairs people in my list.', usage: `${this.botNameString} pair`},
+  { name: 'Add', description: 'Adds people to my list.', usage: `${this.botNameString} add users @joe @bob`},
+  { name: 'Remove', description: 'Removes people from my list.', usage: `${this.botNameString} remove users @joe @bob`},
+  { name: 'Show list', description: 'Shows the people in my list in this channel.', usage: `${this.botNameString} list users`},
 ];
 const formattedCommands = commands.map(c => {
   return `${c.name}: \`${c.usage}\` _${c.description}_`;
@@ -14,11 +14,11 @@ const formattedCommands = commands.map(c => {
 class BotIntentTranslator {
   constructor(client, botName) {
     this.client = client;
-    this.botName = botName;
+    this.botNameString = `<@${botName}>`;
   }
   
   warnNoUsersToAdd({context}) {
-    this.client.messageChannel(`I didn\'t see any names to add. You can try something similar to "${this.botName} add users @joe @bob".`, context.channel, context.user); 
+    this.client.messageChannel(`I didn\'t see any names to add. You can try something similar to "${this.botNameString} add users @joe @bob".`, context.channel, context.user); 
   }
   
   informAddStatus({entities, context}) {
@@ -28,9 +28,9 @@ class BotIntentTranslator {
     }
     if (unknownUsers.length) {
       if (unknownUsers.length === 1) {
-        this.client.messageChannel(`I don't know who ${englishJoinList(unknownUsers)} is, but I added them anyways. Say "${this.botName} remove ${unknownUsers.join(" ")}" to remove them.`, context.channel, context.user);
+        this.client.messageChannel(`I don't know who ${englishJoinList(unknownUsers)} is, but I added them anyways. Say "${this.botNameString} remove ${unknownUsers.join(" ")}" to remove them.`, context.channel, context.user);
       } else {
-        this.client.messageChannel(`I don't know who ${englishJoinList(unknownUsers)} are, but I added them anyways. Say "${this.botName} remove ${unknownUsers.join(" ")}" to remove them.`, context.channel, context.user);
+        this.client.messageChannel(`I don't know who ${englishJoinList(unknownUsers)} are, but I added them anyways. Say "${this.botNameString} remove ${unknownUsers.join(" ")}" to remove them.`, context.channel, context.user);
       }
     }
     if (existingUsers.length) {
@@ -47,7 +47,7 @@ class BotIntentTranslator {
   }
   
   warnNoUsersToRemove({context}) {
-    this.client.messageChannel(`I didn\'t see any names to remove. You can try something similar to "${this.botName} remove users @joe @bob".`, context.channel, context.user);
+    this.client.messageChannel(`I didn\'t see any names to remove. You can try something similar to "${this.botNameString} remove users @joe @bob".`, context.channel, context.user);
   }
   
   informRemoveStatus({entities, context}) {
@@ -67,7 +67,7 @@ class BotIntentTranslator {
   informListStatus({entities, context}) {
     const {users} = entities;
     if (!users.length) {
-      this.client.messageChannel(`I don't have any people in my list. You can try something similar to "${this.botName} add users @joe @bob" to add some.`, context.channel);
+      this.client.messageChannel(`I don't have any people in my list. You can try something similar to "${this.botNameString} add users @joe @bob" to add some.`, context.channel);
     } else if (users.length === 1) {
       this.client.messageChannel(`${englishJoinList(users)} is the only person in my list.`, context.channel);
     } else {
@@ -78,13 +78,13 @@ class BotIntentTranslator {
   warnNotEnoughUsersToPair({entities, context}) {
     const {users} = entities;
     if (users.length === 0) {
-      this.client.messageChannel(`There are no users to pair. You can try something similar to "${this.botName} add users @joe @bob" to add some.`, context.channel, context.user);
+      this.client.messageChannel(`There are no users to pair. You can try something similar to "${this.botNameString} add users @joe @bob" to add some.`, context.channel, context.user);
     } else if (users.length === 1) {
-      this.client.messageChannel(`I can't pair only one person! You can try something similar to "${this.botName} add users @joe @bob" to add some.`, context.channel, context.user);
+      this.client.messageChannel(`I can't pair only one person! You can try something similar to "${this.botNameString} add users @joe @bob" to add some.`, context.channel, context.user);
     } else if (users.length === 2) {
-      this.client.messageChannel(`Here's your pair: ${users.join(" - ")}. You probably want to add more users though. You can try "${this.botName} add users @joe @bob".`, context.channel, context.user);
+      this.client.messageChannel(`Here's your pair: ${users.join(" - ")}. You probably want to add more users though. You can try "${this.botNameString} add users @joe @bob".`, context.channel, context.user);
     } else if (users.length === 3) {
-      this.client.messageChannel(`Here's your triplet: ${users.join(" - ")}. You probably want to add more users though. You can try "${this.botName} add users @joe @bob".`, context.channel, context.user);
+      this.client.messageChannel(`Here's your triplet: ${users.join(" - ")}. You probably want to add more users though. You can try "${this.botNameString} add users @joe @bob".`, context.channel, context.user);
     } else {
       console.error(new Error("we shouldn't be warning when there are 3 users or more!"));
       this.exceptionThrown({context});
@@ -100,11 +100,11 @@ class BotIntentTranslator {
   }
   
   introduce({context}) {
-    this.client.messageChannel(`Hi, I'm ${this.botName}, a bot.\nI keep a list of people and can group them up into pairs, usually for pair programming. If there's an odd number of people, one group will have three people. Here's the things you can tell me to do:\n${formattedCommands}`, context.channel, context.user);
+    this.client.messageChannel(`Hi, I'm ${this.botNameString}, a bot.\nI keep a list of people and can group them up into pairs, usually for pair programming. If there's an odd number of people, one group will have three people. Here's the things you can tell me to do:\n${formattedCommands}`, context.channel, context.user);
   }
   
   informUnknown({context}) {
-    this.client.messageChannel(`Sorry, I didn't understand that. To find out what I can understand, say "${this.botName} help".`, context.channel, context.user);
+    this.client.messageChannel(`Sorry, I didn't understand that. To find out what I can understand, say "${this.botNameString} help".`, context.channel, context.user);
   }
 }
 
