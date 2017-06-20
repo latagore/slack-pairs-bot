@@ -91,7 +91,7 @@ class BotIntentTranslator {
     }
   }
   
-  informPairStatus({entities, context}) {
+  informGroupStatus({entities, context}) {
     const {groups} = entities;
     const groupsString = groups.map((g) => g.join(" - "))
       .join("\n");

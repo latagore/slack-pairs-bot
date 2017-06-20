@@ -37,6 +37,9 @@ class IntentInterpreter {
       } else if (startsWith(messageText, "pair")) {
         intent = "pairUsersCommand";
         entities = {};
+      } else if (messageText.match("^triple|trio")) {
+        intent = "trioUsersCommand";
+        entities = {};
       } else if (messageText.match(/\b(hi|hello)\b/i)) {
         intent = "greeting";
         entities = {};

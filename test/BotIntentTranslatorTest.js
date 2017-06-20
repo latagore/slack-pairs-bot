@@ -338,7 +338,7 @@ describe('Bot intent translator', function () {
      
     var translator = new BotIntentTranslator(client);
     
-    translator.informPairStatus({context: context, entities: entities});
+    translator.informGroupStatus({context: context, entities: entities});
     expect(client.messageChannel.calledOnce).to.be.true; 
     expect(messages[0].channel).to.equal(context.channel);
     expect(messages[0].userId).to.equal(undefined);

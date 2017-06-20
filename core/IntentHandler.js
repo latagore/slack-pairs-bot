@@ -105,6 +105,44 @@ class IntentHandler {
           resolve(action);
         });
 
+      } else if (intent === "trioUsersCommand") {
+        this.client.getList(context.channel)
+        .then((users) => {
+          if (users.length <= 3) {
+            action = {intent: "warnNotEnoughUsersToPair", entities: {users}};
+          } else {
+            shuffle(users);
+
+            const groups = [];
+            while (users.length > 4) {
+              const group = [];
+              group.push(users.pop());
+              group.push(users.pop());
+              group.push(users.pop());
+
+              groups.push(group);
+            }
+            
+            if (users.length === 4) {
+              const group1 = [];
+              group1.push(users.pop());
+              group1.push(users.pop());
+              
+              const group2 = [];
+              group2.push(users.pop());
+              group2.push(users.pop());
+              groups.push(group1, group2);
+            } else {
+            // add remaining people in one group
+            // whether it has 2 or 3 people
+              groups.push(users);
+            }
+
+            action = {intent: "informGroupStatus", entities: {groups}};
+          }
+          resolve(action);
+        });
+
       } else if (intent === "greeting") {
         action = { intent: "introduce" };
         resolve(action);
