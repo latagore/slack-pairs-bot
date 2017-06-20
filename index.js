@@ -15,12 +15,15 @@ if (!mongodb_uri) throw new Error("Need to provide MONGO_URI environment variabl
 
 const web = new WebClient(token);
 const rtm = new RtmClient(bot_token);
-rtm.start();
 
 let botUser;
-
-rtm.on(CLIENT_EVENTS.RTM.AUTHENTICATED, function (rtmStartData) {
-  console.log(`Bot started. Logged in as ${rtmStartData.self.name} of team ${rtmStartData.team.name}.`);
-  const slackClient = new SlackClient(rtm, web, rtmStartData);
-  botUser = rtmStartData.self;
+MongoClient.connect(mongodb_uri, (err, db) => {
+  if (err) throw err;
+  
+  rtm.on(CLIENT_EVENTS.RTM.AUTHENTICATED, function (rtmStartData) {
+    console.log(`Bot started. Logged in as ${rtmStartData.self.name} of team ${rtmStartData.team.name}.`);
+    const slackClient = new SlackClient(rtm, web, db, rtmStartData);
+    botUser = rtmStartData.self;
+  });
+  rtm.start();
 });

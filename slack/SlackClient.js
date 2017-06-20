@@ -20,7 +20,7 @@ class SlackClient {
     this.botIntentTranslator = new BotIntentTranslator(this, botName);
 
     this.rtm.on(RTM_EVENTS.MESSAGE, (message) => {
-      console.log(message);
+      console.log('incoming message: ', message);
       var {intent, entities, isForBot} = this.intentInterpreter.interpret(message);
       if (isForBot) {
         var context = message;
@@ -28,7 +28,7 @@ class SlackClient {
         .then((action) => {
           if (action) {
             // execute the action by looking up the action as a property of the botIntentTranslator
-            console.log(action);
+            console.log('action: ', action);
             this.botIntentTranslator[action.intent]({entities: action.entities, context});
           } else {
             console.warn("shouldn't we have an action for this?");
@@ -55,8 +55,10 @@ class SlackClient {
   }
   
   addUsersToList(listId, userIds) {
-    this.db.collection('lists').update(
-      { listId: listId },
+    console.log(userIds);
+    console.log({ $each: userIds });
+    this.db.collection('channels').update(
+      { name: listId },
       { 
         $addToSet: {
           list: { $each: userIds }
@@ -67,17 +69,35 @@ class SlackClient {
   }
   
   removeUsersFromList(listId, userIds) {
-    this.db.collection('lists').update(
-      { listId: listId },
+    console.log(userIds);
+    this.db.collection('channels').update(
+      { name: listId },
       { 
-        list: { $pullAll: userIds }
+         $pullAll: { list: userIds }
       },
       { upsert: true }
     );
   }
   
   getList(listId) {
-    return this.db.collection('lists').find({list: listId}).toArray();
+    console.log("listId: ", listId);
+    return new Promise((resolve, reject) => {
+      // use findAndModify to insert a doc if it doesn't already exist
+      this.db.collection('channels').findAndModify(
+        {name: listId},
+        [],
+        {$setOnInsert: {list: []}},
+        {
+          new: true,
+          upsert: true
+        },
+        (err, result) => {
+          if (err) reject(err);
+          console.log("findAndModify result: ", result);
+          resolve(result.value.list);
+        }
+      );
+    });
   }
   
 }

@@ -33,10 +33,11 @@ class IntentHandler {
           resolve(action);
         } else {
           // fetch users based on entities from message
-          this.classifyUsers(usersIdToAdd, this.client.getList(context.channel))
+          this.client.getList(context.channel)
+          .then((list) => this.classifyUsers(usersIdToAdd, list))
           .then(({knownUsers, unknownUsers, existingUsers}) => {
-            this.client.addUsersToList(knownUsers.concat(unknownUsers));
-            
+            this.client.addUsersToList(context.channel, knownUsers.concat(unknownUsers));
+
             action = {intent: "informAddStatus", entities: {unknownUsers, knownUsers, existingUsers}};
 
             resolve(action);
@@ -56,48 +57,54 @@ class IntentHandler {
 
         const removedUsers = [];
         const unknownUsers = [];
-        const list = this.client.getList(context.channel);
-        usersIdToRemove.forEach(userId => {
-          if (list.indexOf(userId) !== -1) {
-            removedUsers.push(userId);
-          } else {
-            unknownUsers.push(userId);
-          }
+
+        this.client.getList(context.channel)
+        .then((list) => {
+          usersIdToRemove.forEach(userId => {
+            if (list.indexOf(userId) !== -1) {
+              removedUsers.push(userId);
+            } else {
+              unknownUsers.push(userId);
+            }
+          });
+          this.client.removeUsersFromList(context.channel, removedUsers);
+
+          action = {intent: "informRemoveStatus", entities: {removedUsers, unknownUsers}};
+
+          resolve(action);
         });
-        this.client.removeUsersFromList(removedUsers);
-
-        action = {intent: "informRemoveStatus", entities: {removedUsers, unknownUsers}};
-
-        resolve(action);
       } else if (intent === "listUsersCommand") {
-        let users = this.client.getList(context.channel);
-
-        action = {intent: "informListStatus", entities: {users}};
-        resolve(action);
+        this.client.getList(context.channel)
+        .then((users) => {
+          action = {intent: "informListStatus", entities: {users}};
+          resolve(action);
+        });
       } else if (intent === "pairUsersCommand") {
-        let users = this.client.getList(context.channel);
+        this.client.getList(context.channel)
+        .then((users) => {
+          if (users.length <= 3) {
+            action = {intent: "warnNotEnoughUsersToPair", entities: {users}};
+          } else {
+            shuffle(users);
 
-        if (users.length <= 3) {
-          action = {intent: "warnNotEnoughUsersToPair", entities: {users}};
-        } else {
-          shuffle(users);
-          
-          const groups = [];
-          while (users.length > 3) {
-            const pair = [];
-            pair.push(users.pop());
-            pair.push(users.pop());
+            const groups = [];
+            while (users.length > 3) {
+              const pair = [];
+              pair.push(users.pop());
+              pair.push(users.pop());
 
-            groups.push(pair);
+              groups.push(pair);
+            }
+
+            // add remaining people in one group
+            // whether it has 2 or 3 people
+            groups.push(users);
+
+            action = {intent: "informPairStatus", entities: {groups}};
           }
+          resolve(action);
+        });
 
-          // add remaining people in one group
-          // whether it has 2 or 3 people
-          groups.push(users);
-
-          action = {intent: "informPairStatus", entities: {groups}};
-        }
-        resolve(action);
       } else if (intent === "greeting") {
         action = { intent: "introduce" };
         resolve(action);
@@ -118,12 +125,12 @@ class IntentHandler {
   }
 
   classifyUsers(usersIdToAdd, list) {
-    return this.client.getUsers()
+    console.log("list: ", list);
+    return this.client.getAllUsers()
     .then((response) => {
       if (!response.ok) {
        throw new Error(response);
-      } 
-
+      }
       // create lookup map for all users by their id
       let userMap = {};
       response.members.forEach(user => { userMap[user.id] = user; });
