@@ -6,7 +6,7 @@ var sinon = require('sinon');
 
 var clientList;
 var client = {
-  getUsers: 
+  getAllUsers: 
     sinon.stub().returns(Promise.resolve({
       ok: true,
       members: [
@@ -35,7 +35,7 @@ var client = {
 
 beforeEach(function () {
   clientList = new Set();
-  client.getUsers.resetHistory();
+  client.getAllUsers.resetHistory();
   client.getList.reset();
   client.addUsersToList.reset();
   client.removeUsersFromList.reset();
@@ -66,19 +66,19 @@ describe('intent handlers', function() {
     var channel = "someChannel";
     var ih = new IntentHandler(client);
     
-    expect(client.getUsers.called).to.be.false;
+    expect(client.getAllUsers.called).to.be.false;
     
     return ih.handleIntent(
       "addUserCommand",
       { users: addUsersList1 },
       { channel: channel }
     ).then(function (action) {
-      expect(client.getUsers.calledOnce).to.be.true;
+      expect(client.getAllUsers.calledOnce).to.be.true;
       expect(client.addUsersToList.calledOnce).to.be.true;
       expect(action).to.be.deep.equal(expectedAction1);
       expect(Array.from(clientList)).to.be.deep.equal(addUsersList1);
       
-      client.getUsers.resetHistory();
+      client.getAllUsers.resetHistory();
       client.addUsersToList.reset();
     }).then(function () {
       return ih.handleIntent(
@@ -87,7 +87,7 @@ describe('intent handlers', function() {
         { channel: channel }
       );
     }).then(function (action) {
-      expect(client.getUsers.calledOnce).to.be.true;
+      expect(client.getAllUsers.calledOnce).to.be.true;
       expect(client.addUsersToList.calledOnce).to.be.true;
       expect(action).to.be.deep.equal(expectedAction2);
       expect(Array.from(clientList)).to.be.deep
@@ -118,19 +118,19 @@ describe('intent handlers', function() {
     var ih = new IntentHandler(client);
     
     
-    expect(client.getUsers.called).to.be.false;
+    expect(client.getAllUsers.called).to.be.false;
     
     return ih.handleIntent(
       "addUserCommand",
       { users: addUsersList },
       { channel: channel }
     ).then(function (action) {
-      expect(client.getUsers.calledOnce).to.be.true;
+      expect(client.getAllUsers.calledOnce).to.be.true;
       expect(client.addUsersToList.calledOnce).to.be.true;
       expect(action).to.be.deep.equal(expectedAction1);
       expect(Array.from(clientList)).to.be.deep.equal(uniqueList);
 
-      client.getUsers.resetHistory();
+      client.getAllUsers.resetHistory();
       client.addUsersToList.reset();
     }).then(function () {
       return ih.handleIntent(
@@ -139,7 +139,7 @@ describe('intent handlers', function() {
         { channel: channel }
       );
     }).then(function (action) {
-      expect(client.getUsers.calledOnce).to.be.true;
+      expect(client.getAllUsers.calledOnce).to.be.true;
       expect(action).to.be.deep.equal(expectedAction2);
       expect(Array.from(clientList)).to.be.deep.equal(uniqueList);
     });
@@ -166,19 +166,19 @@ describe('intent handlers', function() {
     var ih = new IntentHandler(client);
     
     
-    expect(client.getUsers.called).to.be.false;
+    expect(client.getAllUsers.called).to.be.false;
     
     return ih.handleIntent(
         "addUserCommand",
         { users: emptyUsersList },
         { channel: channel }
     ).then(function (action) {
-      expect(client.getUsers.called).to.be.false;
+      expect(client.getAllUsers.called).to.be.false;
       expect(client.addUsersToList.called).to.be.false;
       expect(action).to.be.deep.equal(expectedAction1);
       expect(Array.from(clientList)).to.be.deep.equal(emptyUsersList);
       
-      client.getUsers.resetHistory();
+      client.getAllUsers.resetHistory();
       client.addUsersToList.reset();
     }).then(function () {
       return ih.handleIntent(
@@ -187,12 +187,12 @@ describe('intent handlers', function() {
         { channel: channel }
       );
     }).then(function (action) {
-      expect(client.getUsers.calledOnce).to.be.true;
+      expect(client.getAllUsers.calledOnce).to.be.true;
       expect(client.addUsersToList.calledOnce).to.be.true;
       expect(action).to.be.deep.equal(expectedAction2);
       expect(Array.from(clientList)).to.be.deep.equal(addUsersList);
       
-      client.getUsers.resetHistory();
+      client.getAllUsers.resetHistory();
       client.addUsersToList.reset();
     }).then(function () {
       return ih.handleIntent(
@@ -201,7 +201,7 @@ describe('intent handlers', function() {
         { channel: channel }
       );
     }).then(function (action) {
-      expect(client.getUsers.called).to.be.false;
+      expect(client.getAllUsers.called).to.be.false;
       expect(client.addUsersToList.calledOnce).to.be.false;
       expect(action).to.be.deep.equal(expectedAction3);
       expect(Array.from(clientList)).to.be.deep.equal(addUsersList);
@@ -326,19 +326,19 @@ describe('intent handlers', function() {
     var channel = "someChannel";
     var ih = new IntentHandler(client);
     
-    expect(client.getUsers.called).to.be.false;
+    expect(client.getAllUsers.called).to.be.false;
     
     return ih.handleIntent(
       "addUserCommand",
       { users: addUsersList1 },
       { channel: channel }
     ).then(function (action) {
-      expect(client.getUsers.calledOnce).to.be.true;
+      expect(client.getAllUsers.calledOnce).to.be.true;
       expect(client.addUsersToList.calledOnce).to.be.true;
       expect(Array.from(clientList)).to.be.deep.equal(addUsersList1);
       expect(action).to.be.deep.equal(expectedAction1);
       
-      client.getUsers.resetHistory();
+      client.getAllUsers.resetHistory();
       client.addUsersToList.reset();
     }).then(function () {
       return ih.handleIntent(
@@ -347,7 +347,7 @@ describe('intent handlers', function() {
         { channel: channel }
       );
     }).then(function (action) {
-      expect(client.getUsers.calledOnce).to.be.true;
+      expect(client.getAllUsers.calledOnce).to.be.true;
       // sort to make sure they are in same order
       expect(Array.from(clientList).sort()).to.be.deep.equal(addUsersList1.concat(addUsersList2).sort());
       expect(action).to.be.deep.equal(expectedAction2);

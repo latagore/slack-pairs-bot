@@ -50,7 +50,7 @@ class SlackClient {
     }
   }
   
-  getUsers() {
+  getAllUsers() {
     return this.web.users.listAsync(false);
   }
   
