@@ -14,7 +14,6 @@ function shuffle(a) {
 class IntentHandler {
   constructor(client) {
     this.client = client;
-    this.list = {};
   }
   
   handleIntent(intent, entities, context) {
@@ -22,9 +21,7 @@ class IntentHandler {
     // user list
     // channel name
     // requestor name
-    // actual message?
-    this.list[context.channel] = this.list[context.channel] || new Set();
-    
+    // actual message?    
     let action;
     const promise = new Promise((resolve, reject) => {
 
@@ -36,13 +33,10 @@ class IntentHandler {
           resolve(action);
         } else {
           // fetch users based on entities from message
-          this.classifyUsers(usersIdToAdd, this.list[context.channel])
+          this.classifyUsers(usersIdToAdd, this.client.getList(context.channel))
           .then(({knownUsers, unknownUsers, existingUsers}) => {
-            // add ids to our list
-            // FIXME should use Set instead of array
-            knownUsers.forEach((id) => this.list[context.channel].add(id));
-            unknownUsers.forEach((id) => this.list[context.channel].add(id));
-
+            this.client.addUsersToList(knownUsers.concat(unknownUsers));
+            
             action = {intent: "informAddStatus", entities: {unknownUsers, knownUsers, existingUsers}};
 
             resolve(action);
@@ -62,25 +56,26 @@ class IntentHandler {
 
         const removedUsers = [];
         const unknownUsers = [];
+        const list = this.client.getList(context.channel);
         usersIdToRemove.forEach(userId => {
-          if (this.list[context.channel].has(userId)) {
+          if (list.indexOf(userId) !== -1) {
             removedUsers.push(userId);
-            this.list[context.channel].delete(userId);
           } else {
             unknownUsers.push(userId);
           }
         });
+        this.client.removeUsersFromList(removedUsers);
 
         action = {intent: "informRemoveStatus", entities: {removedUsers, unknownUsers}};
 
         resolve(action);
       } else if (intent === "listUsersCommand") {
-        let users = Array.from(this.list[context.channel]);
+        let users = this.client.getList(context.channel);
 
         action = {intent: "informListStatus", entities: {users}};
         resolve(action);
       } else if (intent === "pairUsersCommand") {
-        let users = Array.from(this.list[context.channel]);
+        let users = this.client.getList(context.channel);
 
         if (users.length <= 3) {
           action = {intent: "warnNotEnoughUsersToPair", entities: {users}};
@@ -151,7 +146,7 @@ class IntentHandler {
       let existingUsers = [];
       usersToAdd.forEach(result => {
         let id;
-        if (list.has(result.text)) {
+        if (list.indexOf(result.text) !== -1) {
           existingUsers.push(result.text);
         } else if (result.user) {
           knownUsers.push(result.text);
