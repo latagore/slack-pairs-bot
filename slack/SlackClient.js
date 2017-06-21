@@ -55,28 +55,38 @@ class SlackClient {
   }
   
   addUsersToList(listId, userIds) {
-    console.log(userIds);
-    console.log({ $each: userIds });
-    this.db.collection('channels').update(
-      { name: listId },
-      { 
-        $addToSet: {
-          list: { $each: userIds }
+    return new Promise((resolve, reject) => {
+      this.db.collection('channels').update(
+        { name: listId },
+        { 
+          $addToSet: {
+            list: { $each: userIds }
+          }
+        },
+        { upsert: true },
+        function(err, result) {
+          if (err) reject(err);
+          resolve(result);
         }
-      },
-      { upsert: true }
-    );
+      );
+    });
   }
   
   removeUsersFromList(listId, userIds) {
-    console.log(userIds);
-    this.db.collection('channels').update(
-      { name: listId },
-      { 
-         $pullAll: { list: userIds }
-      },
-      { upsert: true }
-    );
+    return new Promise((resolve, reject) => {
+
+      this.db.collection('channels').update(
+        { name: listId },
+        { 
+           $pullAll: { list: userIds }
+        },
+        { upsert: true },
+        (err, result) => {
+          if (err) reject(err);
+          resolve(result);
+        }
+      );
+    });
   }
   
   getList(listId) {

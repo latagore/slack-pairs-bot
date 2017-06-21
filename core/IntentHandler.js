@@ -36,8 +36,10 @@ class IntentHandler {
           this.client.getList(context.channel)
           .then((list) => this.classifyUsers(usersIdToAdd, list))
           .then(({knownUsers, unknownUsers, existingUsers}) => {
-            this.client.addUsersToList(context.channel, knownUsers.concat(unknownUsers));
-
+            return this.client.addUsersToList(context.channel, knownUsers.concat(unknownUsers))
+            .then(() => { return {knownUsers, unknownUsers, existingUsers}; });
+          })
+          .then(({knownUsers, unknownUsers, existingUsers}) => {
             action = {intent: "informAddStatus", entities: {unknownUsers, knownUsers, existingUsers}};
 
             resolve(action);
@@ -67,16 +69,28 @@ class IntentHandler {
               unknownUsers.push(userId);
             }
           });
-          this.client.removeUsersFromList(context.channel, removedUsers);
-
+          return this.client.removeUsersFromList(context.channel, removedUsers)
+          .then(() => { return { removedUsers, unknownUsers }; });
+        })
+        .then(({removedUsers, unknownUsers}) => {
           action = {intent: "informRemoveStatus", entities: {removedUsers, unknownUsers}};
 
+          resolve(action);
+        })
+        .catch((err) => {
+          console.error(err);
+          action = {intent: "exceptionThrown"};
           resolve(action);
         });
       } else if (intent === "listUsersCommand") {
         this.client.getList(context.channel)
         .then((users) => {
           action = {intent: "informListStatus", entities: {users}};
+          resolve(action);
+        })
+        .catch((err) => {
+          console.error(err);
+          action = {intent: "exceptionThrown"};
           resolve(action);
         });
       } else if (intent === "pairUsersCommand") {
@@ -102,6 +116,11 @@ class IntentHandler {
 
             action = {intent: "informPairStatus", entities: {groups}};
           }
+          resolve(action);
+        })
+        .catch((err) => {
+          console.error(err);
+          action = {intent: "exceptionThrown"};
           resolve(action);
         });
 
@@ -140,6 +159,11 @@ class IntentHandler {
 
             action = {intent: "informGroupStatus", entities: {groups}};
           }
+          resolve(action);
+        })
+        .catch((err) => {
+          console.error(err);
+          action = {intent: "exceptionThrown"};
           resolve(action);
         });
 
