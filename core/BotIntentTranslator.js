@@ -102,7 +102,7 @@ class BotIntentTranslator {
   introduce({context}) {
     const commands = [
       { name: 'Pair', description: 'Pairs people in my list.', usage: `${this.botNameString} pair`},
-      { name: 'Trio', description: 'Groups people in my list into trios.', usage: `${this.botNameString} pair`},
+      { name: 'Trio', description: 'Groups people in my list into trios if possible.', usage: `${this.botNameString} trio`},
       { name: 'Add', description: 'Adds people to my list.', usage: `${this.botNameString} add users @joe @bob`},
       { name: 'Remove', description: 'Removes people from my list.', usage: `${this.botNameString} remove users @joe @bob`},
       { name: 'Show list', description: 'Shows the people in my list in this channel.', usage: `${this.botNameString} list users`},
